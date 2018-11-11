@@ -64,13 +64,14 @@ measurequality=~isempty(QualMeasOpts);
 
 [alphablocks,orig_index]=order_subsets(angles,blocksize,OrderStrategy);
 
-angles=cell2mat(alphablocks);
-index_angles=cell2mat(orig_index);
+angles        = cell2mat(alphablocks);
+index_angles  = cell2mat(orig_index);
 
 % does detector rotation exists?
 if ~isfield(geo,'rotDetector')
     geo.rotDetector=[0;0;0];
 end
+
 %% Create weigthing matrices for the SART step
 % the reason we do this, instead of calling the SART fucntion is not to
 % recompute the weigths every ASD-POCS iteration, thus effectively doubling
@@ -125,12 +126,12 @@ while ~stop_criteria %POCS
         if size(rotDetector,2)==size(angles,2)
             geo.rotDetector=rotDetector(:,index_angles(:,jj));
         end
-        if size(DSD,2)==size(angles,2)
-            geo.DSD=DSD(jj);
-        end
-        if size(DSO,2)==size(angles,2)
-            geo.DSO=DSO(jj);
-        end
+        %if size(DSD,2)==size(angles,2)
+        %    geo.DSD=DSD(jj);
+        %end
+        %if size(DSO,2)==size(angles,2)
+        %    geo.DSO=DSO(jj);
+        %end
         %         proj_err=proj(:,:,jj)-Ax(f,geo,angles(:,jj));          %                                 (b-Ax)
         %         weighted_err=W(:,:,jj).*proj_err;                   %                          W^-1 * (b-Ax)
         %         backprj=Atb(weighted_err,geo,angles(:,jj));            %                     At * W^-1 * (b-Ax)
