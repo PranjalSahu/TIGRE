@@ -21,13 +21,14 @@ geo.sDetector = geo.nDetector.*geo.dDetector;       % total size of the detector
 
 % Image parameters
 geo.nVoxel = [46; 2600; 1300];                % number of voxels              (vx)
-geo.dVoxel = [0.085; 0.085; 1];               % size of each voxel            (mm)
+geo.dVoxel = [1; 0.085; 0.085];               % size of each voxel            (mm)
 geo.sVoxel = geo.nVoxel.*geo.dVoxel;          % total size of the image       (mm)
 
 
 % Offsets
 Airgap = 17;
-geo.offOrigin   = [((geo.sVoxel(1)/2)-(geo.DSD-geo.DSO)+Airgap);0;geo.sVoxel(3)/2];
+%geo.offOrigin   = [((geo.sVoxel(1)/2)-(geo.DSD-geo.DSO)+Airgap);0;geo.sVoxel(3)/2];
+geo.offOrigin   = [8; 0; geo.sVoxel(3)/2];
 %geo.offOrigin  = [-110.5; -110.5; -30];      % Offset of image from origin   (mm)              
 geo.offDetector = [0; geo.sDetector(2)/2];    % Offset of Detector            (mm)
 
