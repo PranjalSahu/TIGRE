@@ -66,16 +66,26 @@ for t=3:27
 end
 
 %noise_projections = -log(noise_projections./single(2^14-1));
-noise_projections = noise_projections;
+noise_projections = single(noise_projections);
 
 %% Lets create a OS-SART test for comparison
-%[imgOSSART, errL2OSSART] = OS_SART(noise_projections, geo, angles, 5);
+%[imgOSSART, errL2OSSART] = OS_SART(noise_projections, geo, angles, 20);
 
-recSART = SART(noise_projections, geo, angles, 8, 'OrderStrategy', 'ordered');
+recFDK = FDK(noise_projections,  geo,  angles);
+recSART = SART(noise_projections, geo, angles, 1, 'OrderStrategy', 'random', 'InitImg', recFDK);
 
 %recFDK = FDK(noise_projections,  geo,  angles);
 
 
+temp = zeros(2600, 1300, 46, 'double');
+for t=1:46
+    temp(:, :, t) = recSART(t, :, :);
+    %temp(:, :, t) = recFDK(t, :, :);
+end
+
+fid = fopen('vol12_2600x1300_46.raw','w+');
+cnt = fwrite(fid, temp, 'float');
+fclose(fid);
 
 %% Total Variation algorithms
 %
