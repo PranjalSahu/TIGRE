@@ -20,37 +20,44 @@ geo.sDetector = geo.nDetector.*geo.dDetector;       % total size of the detector
 
 
 % Image parameters
-geo.nVoxel = [2600; 1300; 46];                % number of voxels              (vx)
+geo.nVoxel = [46; 2600; 1300];                % number of voxels              (vx)
 geo.dVoxel = [0.085; 0.085; 1];               % size of each voxel            (mm)
 geo.sVoxel = geo.nVoxel.*geo.dVoxel;          % total size of the image       (mm)
 
 
 % Offsets
-geo.offOrigin   = [-110.5; -110.5; -30];      % Offset of image from origin   (mm)              
+Airgap = 17;
+geo.offOrigin   = [((geo.sVoxel(1)/2)-(geo.DSD-geo.DSO)+Airgap);0;geo.sVoxel(3)/2];
+%geo.offOrigin  = [-110.5; -110.5; -30];      % Offset of image from origin   (mm)              
 geo.offDetector = [0; geo.sDetector(2)/2];    % Offset of Detector            (mm)
 
 
 % Auxiliary 
-geo.accuracy=0.5;                           % Accuracy of FWD proj          (vx/sample)
+geo.accuracy = 0.5;                           % Accuracy of FWD proj          (vx/sample)
 
 %% Load data and generate projections
+
+
 fid = fopen('/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/ClinicalExample/CE-12/proj_LE/angles.ini', 'r');
 angles = fread(fid, 25, 'float');
+angles = angles';
+
 %angles = linspace(-25*pi/180, 25*pi/180, 25);
 
-noise_projections = zeros(3584, 1800, 25, 'double');
+noise_projections = zeros(1800, 3584, 25, 'double');
 files = dir('/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/ClinicalExample/CE-12/proj_LE/Projections_Renamed_Seg_orig');
 for t=3:27
   disp(strcat(files(t).folder, '\', files(t).name))
   fid = fopen(strcat(files(t).folder, '/', files(t).name), 'r');
   c   = fread(fid, 3584*1800, 'float');
   cb  = reshape(c, [3584, 1800]);
+  cb = cb';
   noise_projections(:, :, t-2) = cb;
 end
 
 
 %% Lets create a OS-SART test for comparison
-[imgOSSART, errL2OSSART] = OS_SART(noise_projections, geo, angles, 60);
+[imgOSSART, errL2OSSART] = OS_SART(noise_projections, geo, angles, 10);
 
 %% Total Variation algorithms
 %
@@ -112,9 +119,9 @@ ratio=0.94;
 verb=true;
 
 
-imgASDPOCS = ASD_POCS(noise_projections,geo,angles,50,...
-                    'TViter',ng,'maxL2err',epsilon,'alpha',alpha,... % these are very important
-                    'lambda',lambda,'lambda_red',lambdared,'Ratio',ratio,'Verbose',verb); % less important.
+%imgASDPOCS = ASD_POCS(noise_projections,geo,angles,50,...
+%                    'TViter',ng,'maxL2err',epsilon,'alpha',alpha,... % these are very important
+%                    'lambda',lambda,'lambda_red',lambdared,'Ratio',ratio,'Verbose',verb); % less important.
 
 
                  
@@ -128,10 +135,10 @@ imgASDPOCS = ASD_POCS(noise_projections,geo,angles,50,...
 % The parameters are the same as in ASD-POCS, but also have 'BlockSize' and
 % @OrderStrategy', taken from OS-SART
 
-imgOSASDPOCS = OS_ASD_POCS(noise_projections,geo,angles,50,...
-                     'TViter',ng,'maxL2err',epsilon,'alpha',alpha,... % these are very important
-                     'lambda',lambda,'lambda_red',lambdared,'Ratio',ratio,'Verbose',verb,...% less important.
-                     'BlockSize',size(angles,2)/10,'OrderStrategy','angularDistance'); %OSC options
+%imgOSASDPOCS = OS_ASD_POCS(noise_projections,geo,angles,50,...
+%                     'TViter',ng,'maxL2err',epsilon,'alpha',alpha,... % these are very important
+%                     'lambda',lambda,'lambda_red',lambdared,'Ratio',ratio,'Verbose',verb,...% less important.
+%                     'BlockSize',size(angles,2)/10,'OrderStrategy','angularDistance'); %OSC options
            
                 
            
@@ -189,7 +196,7 @@ imgOSASDPOCS = OS_ASD_POCS(noise_projections,geo,angles,50,...
 % 
                   
 % Uncomment this block later
-imgSARTTV = SART_TV(noise_projections,geo,angles,50,'TViter',100,'TVlambda',50);           
+%imgSARTTV = SART_TV(noise_projections,geo,angles,50,'TViter',100,'TVlambda',50);           
 % Uncomment this block later
 
 
@@ -200,10 +207,10 @@ imgSARTTV = SART_TV(noise_projections,geo,angles,50,'TViter',100,'TVlambda',50);
 %    
 %     OSC-TV             B-ASD-POCS-beta   SART-TV
 
-plotImg([ imgOSASDPOCS imgBASDPOCSbeta imgSARTTV; head imgOSSART  imgASDPOCS ] ,'Dim','Z','Step',2)
+%plotImg([ imgOSASDPOCS imgBASDPOCSbeta imgSARTTV; head imgOSSART  imgASDPOCS ] ,'Dim','Z','Step',2)
  % error
 
-plotImg(abs([ head-imgOSASDPOCS head-imgBASDPOCSbeta head-imgSARTTV;head-head head-imgOSSART  head-imgASDPOCS ]) ,'Dim','Z','Slice',64)
+%plotImg(abs([ head-imgOSASDPOCS head-imgBASDPOCSbeta head-imgSARTTV;head-head head-imgOSSART  head-imgASDPOCS ]) ,'Dim','Z','Slice',64)
 
 
 

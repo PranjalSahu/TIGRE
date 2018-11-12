@@ -172,7 +172,14 @@ for ii=1:niter
             ynesterov=res +bsxfun(@times,1./sum(V(:,:,orig_index{jj}),3),Atb(W(:,:,orig_index{jj}).*(proj(:,:,orig_index{jj})-Ax(res,geo,alphablocks{:,jj},'interpolated')),geo,alphablocks{:,jj}));
             res=(1-gamma)*ynesterov+gamma*ynesterov_prev;
         else
-            res=res+lambda* bsxfun(@times,1./sum(V(:,:,orig_index{jj}),3),Atb(W(:,:,orig_index{jj}).*(proj(:,:,orig_index{jj})-Ax(res,geo,alphablocks{:,jj},'interpolated')),geo,alphablocks{:,jj}));
+            tempa = 1./sum(V(:,:,orig_index{jj}),3);
+            %disp(size(tempa));
+            temp_1 = W(:,:,orig_index{jj});
+            %disp(size(temp_1))
+            tempb = Atb(temp_1.*(proj(:,:,orig_index{jj})-Ax(res,geo,alphablocks{:,jj},'interpolated')), geo, alphablocks{:,jj});
+            %disp('tempb', size(tempb));
+            
+            res=res+lambda* bsxfun(@times, tempa, tempb);
         end
         
         % Non-negativity constrain
@@ -206,12 +213,12 @@ for ii=1:niter
         geo.offDetector=offDetector;
         errornow=im3Dnorm(proj-Ax(res,geo,angles,'ray-voxel'),'L2');
         %     If the error is not minimized
-        if ii~=1 && errornow>errorL2(end) % This 1.1 is for multigrid, we need to focus to only that case
-            if verbose
-                disp(['Convergence criteria met, exiting on iteration number:', num2str(ii)]);
-            end
-            return;
-        end
+        %if ii~=1 && errornow>errorL2(end) % This 1.1 is for multigrid, we need to focus to only that case
+        %    if verbose
+        %        disp(['Convergence criteria met, exiting on iteration number:', num2str(ii)]);
+        %    end
+        %    return;
+        %end
         %     Store Error
         errorL2=[errorL2 errornow];
     end
