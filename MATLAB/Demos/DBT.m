@@ -2,13 +2,8 @@
 clear;
 close all;
 
-%files = dir('C:\Users\psahu\ClinicalExample\CE-12\proj_LE\Projections_Renamed_Seg\');
-%for t=3:27
-%disp(strcat(files(t).folder, '\', files(t).name))
-%end
-%fid = fopen('C:\Users\psahu\ClinicalExample\CE-12\proj_LE\Projections_Renamed_Seg\CE-12_R_LE.3584x1800.0001', 'r');
-%c = fread(fid, 3584*1800, 'float');
-%cb = reshape(c, [3584, 1800]);
+
+
 
 %% Define Geometry
 % 
@@ -38,15 +33,16 @@ geo.offDetector = [0; geo.sDetector(2)/2];    % Offset of Detector            (m
 % Auxiliary 
 geo.accuracy=0.5;                           % Accuracy of FWD proj          (vx/sample)
 
-%% Load data and generate projections 
-angles = linspace(-25*pi/180, 25*pi/180, 25);
-
+%% Load data and generate projections
+fid = fopen('/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/ClinicalExample/CE-12/proj_LE/angles.ini', 'r');
+angles = fread(fid, 25, 'float');
+%angles = linspace(-25*pi/180, 25*pi/180, 25);
 
 noise_projections = zeros(3584, 1800, 25, 'double');
-files       = dir('C:\Users\psahu\ClinicalExample\CE-12\proj_LE\Projections_Renamed_Seg\');
+files = dir('/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/ClinicalExample/CE-12/proj_LE/Projections_Renamed_Seg_orig');
 for t=3:27
-  disp(t)
-  fid = fopen(strcat(files(t).folder, '\', files(t).name));
+  disp(strcat(files(t).folder, '\', files(t).name))
+  fid = fopen(strcat(files(t).folder, '/', files(t).name), 'r');
   c   = fread(fid, 3584*1800, 'float');
   cb  = reshape(c, [3584, 1800]);
   noise_projections(:, :, t-2) = cb;
