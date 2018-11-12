@@ -34,9 +34,9 @@ geo.offDetector = [0; geo.sDetector(2)/2];    % Offset of Detector            (m
 
 % Auxiliary 
 geo.COR=0; 
-geo.accuracy = 0.1;                           % Accuracy of FWD proj          (vx/sample)
-geo.mode = 'cone';
-geo.rotDetector=[0;0;0]; 
+geo.accuracy    = 0.1;                           % Accuracy of FWD proj          (vx/sample)
+geo.mode        = 'cone';
+geo.rotDetector = [0;0;0]; 
 
 fid = fopen('/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/ClinicalExample/CE-12/proj_LE/angles.ini', 'r');
 angles = fread(fid, 25, 'float');
@@ -44,7 +44,7 @@ angles = angles';
 angles = fliplr(angles);
 
 
-%geo = staticDetectorGeo(geo, angles);
+geo = staticDetectorGeo(geo, angles);
 disp(geo.DSD);
 
 %% Load data and generate projections
@@ -66,12 +66,12 @@ for t=3:27
 end
 
 %noise_projections = -log(noise_projections./single(2^14-1));
-noise_projections = noise_projections/10;
+noise_projections = noise_projections;
 
 %% Lets create a OS-SART test for comparison
 %[imgOSSART, errL2OSSART] = OS_SART(noise_projections, geo, angles, 5);
 
-recSART = SART(noise_projections, geo, angles, 5, 'OrderStrategy', 'ordered');
+recSART = SART(noise_projections, geo, angles, 8, 'OrderStrategy', 'ordered');
 
 %recFDK = FDK(noise_projections,  geo,  angles);
 
