@@ -74,7 +74,7 @@ measurequality=~isempty(QualMeasOpts);
 
 blocksize = 5;
 OrderStrategy = 'ordered';
-disp(geo.mode)
+%disp(geo.mode)
 %disp(OrderStrategy)
 
 if nargout>1

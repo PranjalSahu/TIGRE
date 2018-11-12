@@ -41,7 +41,7 @@ geo.rotDetector = [0;0;0];
 fid = fopen('/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/ClinicalExample/CE-12/proj_LE/angles.ini', 'r');
 angles = fread(fid, 25, 'float');
 angles = angles';
-angles = fliplr(angles);
+%angles = fliplr(angles);
 
 
 geo = staticDetectorGeo(geo, angles);

@@ -50,6 +50,9 @@ assert(sum(abs(geo.dDetector.*geo.nDetector-geo.sDetector))<1e-6, 'TIGRE:checkGe
 
 % DSD DSO
 
+%disp(size(geo.DSD));
+%disp(size(angles));
+
 assert(isequal(size(geo.DSD),[1 1]) | isequal(size(geo.DSD),[1 size(angles,2)]),'TIGRE:checkGeo:BadGeometry','geo.DSD Should be 1x1 or 1xsize(angles,2)')
 if isequal(size(geo.DSD),[1 1])
     geo.DSD=repmat(geo.DSD,[1, size(angles,2)]);

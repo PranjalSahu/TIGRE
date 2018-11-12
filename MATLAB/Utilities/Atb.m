@@ -24,6 +24,7 @@ if nargin > 3
    ptype=varargin{1};
 end
 
+disp(isa(projections,'single'));
 
 %% image
 assert(isa(projections,'single'),'TIGRE:Atb:InvalidInput','Image shoudl be single type');

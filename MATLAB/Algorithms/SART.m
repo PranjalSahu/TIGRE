@@ -128,16 +128,16 @@ for ii=1:niter
             geo.offOrigin=offOrigin(:,jj);
         end
         if size(offDetector,2)==size(angles,2)
-            geo.offDetector=offDetector(:,jj);
+            geo.offDetector = offDetector(:,jj);
         end
         if size(rotDetector,2)==size(angles,2)
-            geo.rotDetector=rotDetector(:,jj);
+            geo.rotDetector = rotDetector(:,jj);
         end
         if size(DSD,2)==size(angles,2)
-            geo.DSD=DSD(jj);
+            geo.DSD = DSD(jj);
         end
         if size(DSO,2)==size(angles,2)
-            geo.DSO=DSO(jj);
+            geo.DSO = DSO(jj);
         end
         % --------- Memory expensive-----------
         
@@ -154,7 +154,11 @@ for ii=1:niter
             ynesterov=res +  bsxfun(@times,1./V(:,:,jj),Atb(W(:,:,jj).*(proj(:,:,jj)-Ax(res,geo,angles(:,jj))),geo,angles(:,jj)));
             res=(1-gamma)*ynesterov+gamma*ynesterov_prev;
         else
-            res=res+lambda* bsxfun(@times,1./V(:,:,jj),Atb(W(:,:,jj).*(proj(:,:,jj)-Ax(res,geo,angles(:,jj))),geo,angles(:,jj)));
+            diff_value = proj(:,:,jj)-Ax(res, geo, angles(:,jj));
+            disp(sum(sum(diff_value)));
+            res=res+lambda* bsxfun(@times,1./V(:,:,jj),Atb(W(:,:,jj).*(diff_value),geo,angles(:,jj)));
+            %res=res+lambda* Atb((proj(:,:,jj)-Ax(res,geo,angles(:,jj))),geo,angles(:,jj));
+            %res=res+lambda* bsxfun(@times,1./V(:,:,jj),Atb(W(:,:,jj).*(proj(:,:,jj)-Ax(res,geo,angles(:,jj))),geo,angles(:,jj)));
         end
         if nonneg
             res(res<0)=0;
