@@ -1,4 +1,4 @@
-function [ f,qualMeasOut ] = ASD_POCS(proj,geo,angles,maxiter,varargin)
+function [ f,qualMeasOut ] = ASD_POCS(proj, geo, angles, maxiter, varargin)
 %ASD_POCS Solves the ASD_POCS total variation constrained image in 3D
 % tomography.
 %
@@ -62,10 +62,15 @@ blocksize=1;
 [beta,beta_red,ng,verbose,alpha,alpha_red,rmax,epsilon,OrderStrategy,QualMeasOpts,nonneg]=parse_inputs(proj,geo,angles,varargin);
 measurequality=~isempty(QualMeasOpts);
 
-[alphablocks,orig_index]=order_subsets(angles,blocksize,OrderStrategy);
+[alphablocks, orig_index] = order_subsets(angles, blocksize, OrderStrategy);
 
 angles        = cell2mat(alphablocks);
 index_angles  = cell2mat(orig_index);
+
+
+disp('angles');
+disp(angles);
+
 
 % does detector rotation exists?
 if ~isfield(geo,'rotDetector')
@@ -106,11 +111,14 @@ clear A x y dx dz;
 f=zeros(geo.nVoxel','single');
 
 %%
-stop_criteria=0;
-iter=0;
-offOrigin=geo.offOrigin;
-offDetector=geo.offDetector;
-rotDetector=geo.rotDetector;
+stop_criteria = 0;
+iter          = 0;
+offOrigin     = geo.offOrigin;
+offDetector   = geo.offDetector;
+rotDetector   = geo.rotDetector;
+DSD         = geo.DSD;
+DSO         = geo.DSO;
+
 while ~stop_criteria %POCS
     f0=f;
     if (iter==0 && verbose==1);tic;end
@@ -126,12 +134,12 @@ while ~stop_criteria %POCS
         if size(rotDetector,2)==size(angles,2)
             geo.rotDetector=rotDetector(:,index_angles(:,jj));
         end
-        %if size(DSD,2)==size(angles,2)
-        %    geo.DSD=DSD(jj);
-        %end
-        %if size(DSO,2)==size(angles,2)
-        %    geo.DSO=DSO(jj);
-        %end
+        if size(DSD,2)==size(angles,2)
+            geo.DSD=DSD(jj);
+        end
+        if size(DSO,2)==size(angles,2)
+            geo.DSO=DSO(jj);
+        end
         %         proj_err=proj(:,:,jj)-Ax(f,geo,angles(:,jj));          %                                 (b-Ax)
         %         weighted_err=W(:,:,jj).*proj_err;                   %                          W^-1 * (b-Ax)
         %         backprj=Atb(weighted_err,geo,angles(:,jj));            %                     At * W^-1 * (b-Ax)
@@ -147,9 +155,11 @@ while ~stop_criteria %POCS
     
     geo.offDetector=offDetector;
     geo.offOrigin=offOrigin;
+    geo.DSD=DSD;
+    
     % Save copy of image.
     if measurequality
-        qualMeasOut(:,iter)=Measure_Quality(f0,f,QualMeasOpts);
+        qualMeasOut(:,iter) = Measure_Quality(f0, f, QualMeasOpts);
     end
     % compute L2 error of actual image. Ax-b
     g=Ax(f,geo,angles);

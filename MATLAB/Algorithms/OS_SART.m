@@ -82,14 +82,23 @@ if nargout>1
 else
     computeL2=false;
 end
+
+
 % does detector rotation exists?
 if ~isfield(geo,'rotDetector')
     geo.rotDetector=[0;0;0];
 end
+
+
 %% weigth matrices
 % first order the projection angles
-[alphablocks,orig_index]=order_subsets(angles,blocksize,OrderStrategy);
+[alphablocks, orig_index] = order_subsets(angles, blocksize, OrderStrategy);
 
+%disp('------ test os ---------');
+%disp(alphablocks{1});
+%disp(orig_index{1});
+%disp(angles);
+%disp('-----------------------');
 
 % Projection weigth, W
 geoaux=geo;
@@ -100,6 +109,9 @@ geoaux.dVoxel=geoaux.sVoxel./geoaux.nVoxel;
 W=Ax(ones(geoaux.nVoxel','single'),geoaux,angles,'ray-voxel');  %
 W(W<min(geo.dVoxel)/2)=Inf;
 W=1./W;
+
+
+
 % Back-Projection weigth, V
 if ~isfield(geo,'mode')||~strcmp(geo.mode,'parallel')
     [x,y]=meshgrid(geo.sVoxel(1)/2-geo.dVoxel(1)/2+geo.offOrigin(1):-geo.dVoxel(1):-geo.sVoxel(1)/2+geo.dVoxel(1)/2+geo.offOrigin(1),...
@@ -124,13 +136,16 @@ if ischar(lambda)&&strcmp(lambda,'nesterov')
     ynesterov=zeros(size(res),'single');
     ynesterov_prev=ynesterov;
 end
+
+
+
 %% Iterate
-errorL2=[];
-offOrigin=geo.offOrigin;
-offDetector=geo.offDetector;
-rotDetector=geo.rotDetector;
-DSD=geo.DSD;
-DSO=geo.DSO;
+errorL2     = [];
+offOrigin   = geo.offOrigin;
+offDetector = geo.offDetector;
+rotDetector = geo.rotDetector;
+DSD         = geo.DSD;
+DSO         = geo.DSO;
 
 
 % TODO : Add options for Stopping criteria
@@ -146,21 +161,23 @@ for ii=1:niter
     
     
     for jj=1:length(alphablocks)
+        %disp('subiter');
+        %disp(jj);
         % Get offsets
         if size(offOrigin,2)==size(angles,2)
-            geo.offOrigin=offOrigin(:,orig_index{jj});
+            geo.offOrigin   = offOrigin(:,orig_index{jj});
         end
         if size(offDetector,2)==size(angles,2)
-            geo.offDetector=offDetector(:,orig_index{jj});
+            geo.offDetector = offDetector(:,orig_index{jj});
         end
         if size(rotDetector,2)==size(angles,2)
-            geo.rotDetector=rotDetector(:,orig_index{jj});
+            geo.rotDetector = rotDetector(:,orig_index{jj});
         end
         if size(DSO,2)==size(angles,2)
-            geo.DSO=DSO(:,orig_index{jj});
+            geo.DSO         = DSO(:,orig_index{jj});
         end
         if size(DSD,2)==size(angles,2)
-            geo.DSD=DSD(:,orig_index{jj});
+            geo.DSD         = DSD(:,orig_index{jj});
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%%% Slower and memory-eating code (but clearer)%%%%%%%%%%%%%%%%
@@ -194,6 +211,9 @@ for ii=1:niter
         
     end
     
+    
+    %disp('recon is done');
+    
     % If quality is being measured
     if measurequality
         
@@ -211,12 +231,18 @@ for ii=1:niter
     else
         lambda=lambda*lambdared;
     end
-     
+    
+    geo.DSD = DSD;
+    geo.rotDetector = rotDetector;
+    
+    %disp(size(geo.DSD));
+    %disp(size(angles));
+    
     if computeL2 || nesterov
         % Compute error norm2 of b-Ax
-        geo.offOrigin=offOrigin;
-        geo.offDetector=offDetector;
-        errornow=im3Dnorm(proj-Ax(res,geo,angles,'ray-voxel'),'L2');
+        geo.offOrigin   = offOrigin;
+        geo.offDetector = offDetector;
+        errornow        = im3Dnorm(proj-Ax(res,geo,angles,'ray-voxel'),'L2');
         %     If the error is not minimized
         %if ii~=1 && errornow>errorL2(end) % This 1.1 is for multigrid, we need to focus to only that case
         %    if verbose
@@ -225,7 +251,7 @@ for ii=1:niter
         %    return;
         %end
         %     Store Error
-        errorL2=[errorL2 errornow];
+        errorL2 = [errorL2 errornow];
     end
     % If timing was asked
     if ii==1 && verbose==1

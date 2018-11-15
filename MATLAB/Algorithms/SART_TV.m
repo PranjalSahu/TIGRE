@@ -76,21 +76,31 @@ blocksize=1;
 
 angles=cell2mat(alphablocks);
 index_angles=cell2mat(orig_index);
+
 % does detector rotation exist?
 if ~isfield(geo,'rotDetector')
     geo.rotDetector=[0;0;0];
 end
 %% Create weigthing matrices
+%% Iterate
+offOrigin   = geo.offOrigin;
+offDetector = geo.offDetector;
+rotDetector = geo.rotDetector;
+DSD         = geo.DSD;
+DSO         = geo.DSO;
+
 
 % Projection weigth, W
 geoaux=geo;
-geoaux.sVoxel([1 2])=geo.DSD-geo.DSO;
+geoaux.sVoxel([1 2])=geo.sVoxel([1 2])*1.1;
 geoaux.sVoxel(3)=max(geo.sDetector(2),geo.sVoxel(3)); % make sure lines are not cropped. One is for when image is bigger than detector and viceversa
 geoaux.nVoxel=[2,2,2]'; % accurate enough?
 geoaux.dVoxel=geoaux.sVoxel./geoaux.nVoxel;
 W=Ax(ones(geoaux.nVoxel','single'),geoaux,angles,'ray-voxel');  %
 W(W<min(geo.dVoxel)/4)=Inf;
 W=1./W;
+
+
 % Back-Projection weigth, V
 if ~isfield(geo,'mode')||~strcmp(geo.mode,'parallel')
     [x,y]=meshgrid(geo.sVoxel(1)/2-geo.dVoxel(1)/2+geo.offOrigin(1):-geo.dVoxel(1):-geo.sVoxel(1)/2+geo.dVoxel(1)/2+geo.offOrigin(1),...
@@ -103,10 +113,8 @@ else
 end
 clear A x y dx dz;
 
-%% Iterate
-offOrigin=geo.offOrigin;
-offDetector=geo.offDetector;
-rotDetector=geo.rotDetector;
+
+
 % TODO : Add options for Stopping criteria
 for ii=1:niter
     if (ii==1 && verbose==1);tic;end
@@ -127,12 +135,12 @@ for ii=1:niter
         if size(rotDetector,2)==size(angles,2)
             geo.rotDetector=rotDetector(:,index_angles(:,jj));
         end
-        %if size(DSD,2)==size(angles,2)
-        %    geo.DSD=DSD(jj);
-        %end
-        %if size(DSO,2)==size(angles,2)
-        %    geo.DSO=DSO(jj);
-        %end
+        if size(DSD,2)==size(angles,2)
+            geo.DSD=DSD(jj);
+        end
+        if size(DSO,2)==size(angles,2)
+            geo.DSO=DSO(jj);
+        end
         %         proj_err=proj(:,:,jj)-Ax(res,geo,angles(:,jj));     %                                 (b-Ax)
         %         weighted_err=W(:,:,jj).*proj_err;                   %                          W^-1 * (b-Ax)
         %         backprj=Atb(weighted_err,geo,angles(:,jj));         %                     At * W^-1 * (b-Ax)
