@@ -45,7 +45,7 @@ angles = angles';
 
 
 geo = staticDetectorGeo(geo, angles);
-disp(geo.DSD);
+%disp(geo.DSD);
 
 %% Load data and generate projections
 
@@ -69,24 +69,16 @@ end
 noise_projections = single(noise_projections);
 
 %% Lets create a OS-SART test for comparison
-%[imgOSSART, errL2OSSART] = OS_SART(noise_projections, geo, angles, 20);
+%[imgOSSART, errL2OSSART] = OS_SART(noise_projections, geo, angles, 5, 'OrderStrategy', 'random');
 
-recFDK = FDK(noise_projections,  geo,  angles);
-recSART = SART(noise_projections, geo, angles, 1, 'OrderStrategy', 'random', 'InitImg', recFDK);
-
+%[recFDK, errL2FDK]  = FDK(noise_projections,  geo,  angles);
+%recSART = SART(noise_projections, geo, angles, 2, 'OrderStrategy', 'random', 'InitImg', recFDK);
+%[recSART,  errL2SART] = SART(noise_projections, geo, angles, 3, 'OrderStrategy', 'random');
 %recFDK = FDK(noise_projections,  geo,  angles);
 
 
-temp = zeros(2600, 1300, 46, 'double');
-for t=1:46
-    temp(:, :, t) = recSART(t, :, :);
-    %temp(:, :, t) = recFDK(t, :, :);
-end
 
-fid = fopen('vol12_2600x1300_46.raw','w+');
-cnt = fwrite(fid, temp, 'float');
-fclose(fid);
-
+%3.3106    3.2367    3.2169    3.2064    3.1987
 %% Total Variation algorithms
 %
 %  ASD-POCS: Adaptative Steeppest Descent-Projection On Convex Subsets
@@ -111,15 +103,24 @@ fclose(fid);
 %                  Default is 20% of the FDK L2 norm.
 %                  
 % its called epsilon in the paper
-epsilon = errL2OSSART(end);
+%epsilon = errL2OSSART(end);
 %   'alpha':       Defines the TV hyperparameter. default is 0.002. 
 %                  However the paper mentions 0.2 as good choice
-alpha=0.002;
+alpha   = 0.05;
 
 %   'TViter':      Defines the amount of TV iterations performed per SART
 %                  iteration. Default is 20
 
-ng=25;
+
+%Pranjal Good combination of parameter
+%ng = 50, alpha = 0.2
+%And
+%ng = 25, alpha = 0.2
+%And
+%ng = 25, alpha = 0.2, iter = 50 (best till)
+%ng = 25, alpha = 0.2, iter = 50
+%ng = 25, alpha = 0.1, iter = 5  (good one)
+ng = 25;
 
 % Other optional parameters
 % ----------------------------------------------
@@ -129,8 +130,8 @@ ng=25;
 %   'lambdared':   Reduction of lambda Every iteration
 %                  lambda=lambdared*lambda. Default is 0.99
 %
-lambda=1;
-lambdared=0.98;
+lambda    = 1;
+lambdared = 0.98;
 
 
 %   'alpha_red':   Defines the reduction rate of the TV hyperparameter
@@ -139,20 +140,24 @@ alpha_red=0.95;
 %   'Ratio':       The maximum allowed image/TV update ration. If the TV 
 %                  update changes the image more than this, the parameter
 %                  will be reduced.default is 0.95
-ratio=0.94;
+ratio=0.7;
 
 %   'Verbose'      1 or 0. Default is 1. Gives information about the
 %                  progress of the algorithm.
 
 verb=true;
 
+%'maxL2err',epsilon
+%imgASDPOCS = ASD_POCS(noise_projections, geo, angles, 5,...
+%                    'TViter',ng,'alpha',alpha,... % these are very important
+%                    'lambda',lambda,'lambda_red',lambdared,'Ratio', ratio,'Verbose', verb); % less important.
 
-%imgASDPOCS = ASD_POCS(noise_projections,geo,angles,50,...
-%                    'TViter',ng,'maxL2err',epsilon,'alpha',alpha,... % these are very important
-%                    'lambda',lambda,'lambda_red',lambdared,'Ratio',ratio,'Verbose',verb); % less important.
 
 
-                 
+
+
+
+
 %  OS_ASD_POCS: Odered Subset-TV algorithm
 %==========================================================================
 %==========================================================================
@@ -162,11 +167,12 @@ verb=true;
 %
 % The parameters are the same as in ASD-POCS, but also have 'BlockSize' and
 % @OrderStrategy', taken from OS-SART
+%'maxL2err',epsilon,
 
-%imgOSASDPOCS = OS_ASD_POCS(noise_projections,geo,angles,50,...
-%                     'TViter',ng,'maxL2err',epsilon,'alpha',alpha,... % these are very important
-%                     'lambda',lambda,'lambda_red',lambdared,'Ratio',ratio,'Verbose',verb,...% less important.
-%                     'BlockSize',size(angles,2)/10,'OrderStrategy','angularDistance'); %OSC options
+imgOSASDPOCS = OS_ASD_POCS(noise_projections, geo, angles, 50,...
+                     'TViter', ng, 'alpha', alpha,... % these are very important
+                     'lambda',lambda,'lambda_red',lambdared,'Ratio',ratio,'Verbose',verb,...% less important.
+                     'BlockSize', 5,'OrderStrategy','random'); %OSC options
            
                 
            
@@ -224,8 +230,25 @@ verb=true;
 % 
                   
 % Uncomment this block later
-%imgSARTTV = SART_TV(noise_projections,geo,angles,50,'TViter',100,'TVlambda',50);           
+%disp(geo.DSD);
+%disp(geo.DSO);
+
+%imgSARTTV = SART_TV(noise_projections, geo, angles, 1, 'TViter', 10, 'TVlambda', 10);%, 'InitImg', recFDK);           
 % Uncomment this block later
+
+temp = zeros(2600, 1300, 46, 'double');
+for t=1:46
+    %temp(:, :, t)  = imgOSSART(t, :, :);
+    %temp(:, :, t) = imgASDPOCS(t, :, :);
+    temp(:, :, t) = imgOSASDPOCS(t, :, :);
+    %temp(:, :, t) = recFDK(t, :, :);
+    %temp(:, :, t) = recSART(t, :, :);
+end
+
+fid = fopen('vol27_2600x1300_46.raw','w+');
+cnt = fwrite(fid, temp, 'float');
+fclose(fid);
+
 
 
  %% Lets visualize the results
