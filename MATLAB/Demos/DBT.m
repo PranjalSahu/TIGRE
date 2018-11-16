@@ -169,7 +169,7 @@ verb=true;
 % @OrderStrategy', taken from OS-SART
 %'maxL2err',epsilon,
 
-imgOSASDPOCS = OS_ASD_POCS(noise_projections, geo, angles, 50,...
+imgOSASDPOCS = OS_ASD_POCS(noise_projections, geo, angles, 25,...
                      'TViter', ng, 'alpha', alpha,... % these are very important
                      'lambda',lambda,'lambda_red',lambdared,'Ratio',ratio,'Verbose',verb,...% less important.
                      'BlockSize', 5,'OrderStrategy','random'); %OSC options
@@ -196,11 +196,11 @@ imgOSASDPOCS = OS_ASD_POCS(noise_projections, geo, angles, 50,...
 
 %Note that the number of iteration for TV has changed
 
-%Uncomment this block later
-%imgBASDPOCSbeta=B_ASD_POCS_beta(noise_projections,geo,angles,50,...
-%                    'TViter',40,'maxL2err',epsilon,'alpha',alpha,... % these are very important
-%                     'lambda',lambda,'lambda_red',lambdared,'Ratio',ratio,'Verbose',verb,... % less important.
-%                      'beta',0.5,'beta_red',0.7,'bregman_iter',10); % bregman options
+%'maxL2err',epsilon
+%imgBASDPOCSbeta = B_ASD_POCS_beta(noise_projections, geo, angles, 10,...
+%                    'TViter', ng, 'alpha', alpha,... % these are very important
+%                     'lambda', lambda, 'lambda_red', lambdared, 'Ratio', ratio, 'Verbose', verb,... % less important.
+%                      'beta', 0.5, 'beta_red', 0.7, 'bregman_iter', 5); % bregman options
 %Uncomment this block later 
 
 %   SART-TV 
@@ -233,7 +233,7 @@ imgOSASDPOCS = OS_ASD_POCS(noise_projections, geo, angles, 50,...
 %disp(geo.DSD);
 %disp(geo.DSO);
 
-%imgSARTTV = SART_TV(noise_projections, geo, angles, 1, 'TViter', 10, 'TVlambda', 10);%, 'InitImg', recFDK);           
+%imgSARTTV = SART_TV(noise_projections, geo, angles, 10, 'TViter', 10, 'TVlambda', 1000);%, 'InitImg', recFDK);           
 % Uncomment this block later
 
 temp = zeros(2600, 1300, 46, 'double');
@@ -245,7 +245,7 @@ for t=1:46
     %temp(:, :, t) = recSART(t, :, :);
 end
 
-fid = fopen('vol28_2600x1300_46.raw','w+');
+fid = fopen('vol29_2600x1300_46.raw','w+');
 cnt = fwrite(fid, temp, 'float');
 fclose(fid);
 
