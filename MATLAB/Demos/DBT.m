@@ -106,7 +106,7 @@ noise_projections = single(noise_projections);
 %epsilon = errL2OSSART(end);
 %   'alpha':       Defines the TV hyperparameter. default is 0.002. 
 %                  However the paper mentions 0.2 as good choice
-alpha   = 0.005;
+alpha   = 0.05;
 
 %   'TViter':      Defines the amount of TV iterations performed per SART
 %                  iteration. Default is 20
