@@ -29,7 +29,7 @@ geo.sVoxel = geo.nVoxel.*geo.dVoxel;          % total size of the image       (m
 Airgap = 17;
 geo.offOrigin   = [((geo.sVoxel(1)/2)-(geo.DSD-geo.DSO)+Airgap); 0; geo.sVoxel(3)/2];
 %geo.offOrigin  = [-110.5; -110.5; -30];      % Offset of image from origin   (mm)              
-geo.offDetector = [0; geo.sDetector(2)/2];    % Offset of Detector            (mm)
+geo.offDetector = [0; 0];    % Offset of Detector            (mm)
 
 
 % Auxiliary 
@@ -38,26 +38,20 @@ geo.accuracy    = 0.1;                           % Accuracy of FWD proj         
 geo.mode        = 'cone';
 geo.rotDetector = [0;0;0]; 
 
-fid = fopen('/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/ClinicalExample/CE-12/proj_LE/angles.ini', 'r');
+fid    = fopen('C:\Users\psahu\ClinicalExample\CE-12\proj_LE\angles.ini', 'r');
 angles = fread(fid, 25, 'float');
 angles = angles';
 %angles = fliplr(angles);
 
 
 geo = staticDetectorGeo(geo, angles);
-disp(geo.DSD);
 
 %% Load data and generate projections
 
-
-
-
-%angles = linspace(-25*pi/180, 25*pi/180, 25);
-
 noise_projections = zeros(1800, 3584, 25, 'double');
-files = dir('/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/ClinicalExample/CE-12/proj_LE/Projections_Renamed_Seg_orig');
+files = dir('C:\Users\psahu\ClinicalExample\CE-12\proj_LE\Projections_Renamed_Seg\');
 for t=3:27
-  disp(strcat(files(t).folder, '\', files(t).name))
+  disp(strcat(files(t).folder, '\', files(t).name));
   fid = fopen(strcat(files(t).folder, '/', files(t).name), 'r');
   c   = fread(fid, 3584*1800, 'float');
   cb  = reshape(c, [3584, 1800]);
@@ -71,9 +65,9 @@ noise_projections = single(noise_projections);
 %% Lets create a OS-SART test for comparison
 %[imgOSSART, errL2OSSART] = OS_SART(noise_projections, geo, angles, 20);
 
-recFDK = FDK(noise_projections,  geo,  angles);
-recSART = SART(noise_projections, geo, angles, 1, 'OrderStrategy', 'random', 'InitImg', recFDK);
-
+%recFDK  = FDK(noise_projections,  geo,  angles);
+%recSART = SART(noise_projections, geo, angles, 1, 'OrderStrategy', 'random', 'InitImg', recFDK);
+recSART = SART(noise_projections, geo, angles, 1, 'OrderStrategy', 'random');
 %recFDK = FDK(noise_projections,  geo,  angles);
 
 
@@ -111,7 +105,7 @@ fclose(fid);
 %                  Default is 20% of the FDK L2 norm.
 %                  
 % its called epsilon in the paper
-epsilon = errL2OSSART(end);
+%epsilon = errL2OSSART(end);
 %   'alpha':       Defines the TV hyperparameter. default is 0.002. 
 %                  However the paper mentions 0.2 as good choice
 alpha=0.002;
