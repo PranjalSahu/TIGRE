@@ -2,25 +2,35 @@
 clear;
 close all;
 
-
-% Settings for CE-14
-filepath = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE14/';
-sx_a   = 1618;
+% Settings for CE-12
+filepath = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE12/';
+sx_a   = 1800;
 sy_a   = 3584;
-slices = 71;
-sx_b   = 2690;
-sy_b   = 1198;
-volume_name   = 'CE-14_2600x1300_46.raw';
+slices = 46;
+sx_b   = 2600;
+sy_b   = 1300;
+volume_name   = 'CE-12_2600x1300_46.raw';
 
 
-% Settings for CE-16
-filepath = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE16/';
-sx_a   = 1100;
-sy_a   = 3584;
-slices = 48;
-sx_b   = 2200;
-sy_b   = 980;
-volume_name   = 'CE-16_2200x980_48.raw';
+% % Settings for CE-14
+% filepath = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE14/';
+% sx_a   = 1618;
+% sy_a   = 3584;
+% slices = 71;
+% sx_b   = 2690;
+% sy_b   = 1198;
+% volume_name   = 'CE-14_2690x1198_71.raw';
+% 
+% 
+% % Settings for CE-16
+% filepath = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE16/';
+% sx_a   = 1100;
+% sy_a   = 3584;
+% slices = 48;
+% sx_b   = 2200;
+% sy_b   = 980;
+% volume_name   = 'CE-16_2200x980_48.raw';
+
 
 
 
