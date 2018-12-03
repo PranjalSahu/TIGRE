@@ -3,45 +3,55 @@ clear;
 close all;
 
 
+% Settings for CE-14
+sx_a = 1618;
+sy_a = 3584;
+slices = 71;
+sx_b   = 2690;
+sy_b   = 1198;
+anglefile       = '/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/ClinicalExample/CE-12/proj_LE/angles.ini';
+projections_dir = '/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/ClinicalExample/CE-12/proj_LE/Projections_Renamed_Seg_orig';
+
+
 
 
 %% Define Geometry
 % 
 % VARIABLE                                   DESCRIPTION                    UNITS
 %-------------------------------------------------------------------------------------
+
 geo.DSD = 655;                             % Distance Source Detector      (mm)
 geo.DSO = 608;                             % Distance Source Origin        (mm)
+geo.nDetector = [sy_a;  sx_a];
 
 
 % Detector parameters
-geo.nDetector = [3584;  1800];					    % number of pixels              (px)
+geo.nDetector = [sy_a;  sx_a];					    % number of pixels              (px)
 geo.dDetector = [0.085; 0.085]; 					% size of each pixel            (mm)
 geo.sDetector = geo.nDetector.*geo.dDetector;       % total size of the detector    (mm)
 
 
 % Image parameters
-geo.nVoxel = [46; 2600; 1300];                % number of voxels              (vx)
+geo.nVoxel = [slices; sx_b; sy_b];             % number of voxels              (vx)
 geo.dVoxel = [1 ; 0.085; 0.085];               % size of each voxel            (mm)
-geo.sVoxel = geo.nVoxel.*geo.dVoxel;          % total size of the image       (mm)
+geo.sVoxel = geo.nVoxel.*geo.dVoxel;           % total size of the image       (mm)
 
 
 % Offsets
 Airgap = 17;
-geo.offOrigin   = [((geo.sVoxel(1)/2)-(geo.DSD-geo.DSO)+Airgap); 0; geo.sVoxel(3)/2];
-%geo.offOrigin  = [-110.5; -110.5; -30];      % Offset of image from origin   (mm)              
+geo.offOrigin   = [((geo.sVoxel(1)/2)-(geo.DSD-geo.DSO)+Airgap); 0; geo.sVoxel(3)/2];           
 geo.offDetector = [0; geo.sDetector(2)/2];    % Offset of Detector            (mm)
 
 
 % Auxiliary 
-geo.COR=0; 
+geo.COR         = 0; 
 geo.accuracy    = 0.1;                           % Accuracy of FWD proj          (vx/sample)
 geo.mode        = 'cone';
 geo.rotDetector = [0;0;0]; 
 
-fid = fopen('/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/ClinicalExample/CE-12/proj_LE/angles.ini', 'r');
+fid = fopen(anglefile, 'r');
 angles = fread(fid, 25, 'float');
 angles = angles';
-%angles = fliplr(angles);
 
 
 geo = staticDetectorGeo(geo, angles);
@@ -49,13 +59,10 @@ geo = staticDetectorGeo(geo, angles);
 
 %% Load data and generate projections
 
-
-
-
 %angles = linspace(-25*pi/180, 25*pi/180, 25);
 
 noise_projections = zeros(1800, 3584, 25, 'double');
-files = dir('/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/ClinicalExample/CE-12/proj_LE/Projections_Renamed_Seg_orig');
+files = dir(projections_dir);
 for t=3:27
   disp(strcat(files(t).folder, '\', files(t).name))
   fid = fopen(strcat(files(t).folder, '/', files(t).name), 'r');
@@ -106,7 +113,7 @@ noise_projections = single(noise_projections);
 %epsilon = errL2OSSART(end);
 %   'alpha':       Defines the TV hyperparameter. default is 0.002. 
 %                  However the paper mentions 0.2 as good choice
-alpha   = 0.05;
+alpha   = 0.2;
 
 %   'TViter':      Defines the amount of TV iterations performed per SART
 %                  iteration. Default is 20
@@ -148,9 +155,9 @@ ratio=0.7;
 verb=true;
 
 %'maxL2err',epsilon
-%imgASDPOCS = ASD_POCS(noise_projections, geo, angles, 5,...
-%                    'TViter',ng,'alpha',alpha,... % these are very important
-%                    'lambda',lambda,'lambda_red',lambdared,'Ratio', ratio,'Verbose', verb); % less important.
+imgASDPOCS = ASD_POCS(noise_projections, geo, angles, 50,...
+                    'TViter',ng,'alpha',alpha,... % these are very important
+                    'lambda',lambda,'lambda_red',lambdared,'Ratio', ratio,'Verbose', verb); % less important.
 
 
 
@@ -169,10 +176,10 @@ verb=true;
 % @OrderStrategy', taken from OS-SART
 %'maxL2err',epsilon,
 
-imgOSASDPOCS = OS_ASD_POCS(noise_projections, geo, angles, 25,...
-                     'TViter', ng, 'alpha', alpha,... % these are very important
-                     'lambda',lambda,'lambda_red',lambdared,'Ratio',ratio,'Verbose',verb,...% less important.
-                     'BlockSize', 5,'OrderStrategy','random'); %OSC options
+% imgOSASDPOCS = OS_ASD_POCS(noise_projections, geo, angles, 25,...
+%                      'TViter', ng, 'alpha', alpha,... % these are very important
+%                      'lambda',lambda,'lambda_red',lambdared,'Ratio',ratio,'Verbose',verb,...% less important.
+%                      'BlockSize', 5,'OrderStrategy','random'); %OSC options
            
                 
            
@@ -239,13 +246,13 @@ imgOSASDPOCS = OS_ASD_POCS(noise_projections, geo, angles, 25,...
 temp = zeros(2600, 1300, 46, 'double');
 for t=1:46
     %temp(:, :, t)  = imgOSSART(t, :, :);
-    %temp(:, :, t) = imgASDPOCS(t, :, :);
-    temp(:, :, t) = imgOSASDPOCS(t, :, :);
+    temp(:, :, t) = imgASDPOCS(t, :, :);
+    %temp(:, :, t) = imgOSASDPOCS(t, :, :);
     %temp(:, :, t) = recFDK(t, :, :);
     %temp(:, :, t) = recSART(t, :, :);
 end
 
-fid = fopen('vol29_2600x1300_46.raw','w+');
+fid = fopen('vol30_2600x1300_46.raw','w+');
 cnt = fwrite(fid, temp, 'float');
 fclose(fid);
 
