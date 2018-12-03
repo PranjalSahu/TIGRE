@@ -8,7 +8,7 @@ geo.DSD = geo.DSD-(R-R*cos(angles));
 %geo.DSD=geo.DSD%-(R-R*cos(angles));
 %geo.offDetector=[R*sin(angles); zeros(1,size(angles,2))];
 %geo.offDetector=[R*sin(angles); ones(1, size(angles, 2))*geo.sDetector(2)/2];
-geo.offDetector=[R*sin(angles); ones(1, size(angles, 2))*45];
+geo.offDetector=[R*sin(angles); ones(1, size(angles, 2))*35];
 
 %geo.offDetector=[zeros(1,size(angles,2));  ones(1, size(angles, 2))*geo.sDetector(2)/2];
 %geo.offDetector=[zeros(1,size(angles,2));  ones(1, size(angles, 2))*geo.sDetector(2)/2];

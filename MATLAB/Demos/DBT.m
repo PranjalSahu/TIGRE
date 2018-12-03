@@ -13,6 +13,16 @@ sy_b   = 1198;
 volume_name   = 'CE-14_2600x1300_46.raw';
 
 
+% Settings for CE-16
+filepath = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE16/';
+sx_a   = 1100;
+sy_a   = 3584;
+slices = 48;
+sx_b   = 2200;
+sy_b   = 980;
+volume_name   = 'CE-16_2200x980_48.raw';
+
+
 
 %% Define Geometry
 % 
