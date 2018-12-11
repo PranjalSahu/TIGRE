@@ -1,4 +1,4 @@
-function geo=staticDetectorGeo(geo,angles)
+function geo=staticDetectorGeo(geo,angles, offdetector_height)
 % This fucntion computes the translation and rotations needed in the system
 % to desribe a detector that does not move when the source moves.
 R=(geo.DSD-geo.DSO); %Radious of rotation of detector
@@ -8,7 +8,7 @@ geo.DSD = geo.DSD-(R-R*cos(angles));
 %geo.DSD=geo.DSD%-(R-R*cos(angles));
 %geo.offDetector=[R*sin(angles); zeros(1,size(angles,2))];
 %geo.offDetector=[R*sin(angles); ones(1, size(angles, 2))*geo.sDetector(2)/2];
-geo.offDetector=[R*sin(angles); ones(1, size(angles, 2))*35];
+geo.offDetector=[R*sin(angles); ones(1, size(angles, 2))*offdetector_height];
 
 %geo.offDetector=[zeros(1,size(angles,2));  ones(1, size(angles, 2))*geo.sDetector(2)/2];
 %geo.offDetector=[zeros(1,size(angles,2));  ones(1, size(angles, 2))*geo.sDetector(2)/2];

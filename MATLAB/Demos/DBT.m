@@ -44,14 +44,34 @@ close all;
 %
 %
 % % Settings for CE-17
-filepath = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE17/';
-sx_a   = 1618;
+% filepath = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE17/';
+% sx_a   = 1618;
+% sy_a   = 3584;
+% slices = 46;
+% sx_b   = 2230;
+% sy_b   = 1190;
+% volume_name   = 'CE-16_2230x1190_46.raw';
+%
+%
+% % Settings for CE-18
+% filepath = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE17/';
+% sx_a   = 1618;
+% sy_a   = 3584;
+% slices = 46;
+% sx_b   = 2230;
+% sy_b   = 1190;
+% volume_name   = 'CE-16_2230x1190_46.raw';
+%
+%
+% % Settings for CE-23
+filepath = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE23/';
+sx_a   = 1600;
 sy_a   = 3584;
-slices = 46;
-sx_b   = 2230;
-sy_b   = 1190;
-volume_name   = 'CE-16_2230x1190_46.raw';
-
+slices = 62;
+sx_b   = 3150;
+sy_b   = 1465;
+volume_name   = 'CE-23_3150x1465_62.raw';
+offdetector_height = 55;
 
 
 %% Define Geometry
@@ -59,8 +79,8 @@ volume_name   = 'CE-16_2230x1190_46.raw';
 % VARIABLE                                   DESCRIPTION                    UNITS
 %-------------------------------------------------------------------------------------
 
-anglefile       = strcat(filepath, 'angles.ini');
-projections_dir = strcat(filepath, 'Projections/Projections_Renamed_Seg');
+anglefile       = strcat(filepath, 'LE_proj/angles.ini');
+projections_dir = strcat(filepath, 'LE_proj/Projections_Renamed_Seg');
 volume_path     = strcat(filepath,  volume_name); 
 
 
@@ -98,7 +118,7 @@ angles = fread(fid, 25, 'float');
 angles = angles';
 
 
-geo = staticDetectorGeo(geo, angles);
+geo = staticDetectorGeo(geo, angles, offdetector_height);
 %disp(geo.DSD);
 
 %% Load data and generate projections
