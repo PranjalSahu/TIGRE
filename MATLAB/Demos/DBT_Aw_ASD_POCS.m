@@ -72,17 +72,26 @@ close all;
 %
 %
 % Settings for CE-23 (Works with 3200x1600 and no 3150x1465)
-filepath = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE23/';
-sx_a   = 1600;
+% filepath = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE23/';
+% sx_a   = 1600;
+% sy_a   = 3584;
+% slices = 62;
+% %sx_b   = 3150;
+% %sy_b   = 1465;
+% sx_b = 3200;
+% sy_b = 1600;
+% volume_name   = 'CE-23_3200x1600_62_2.raw';
+% offdetector_height = 55;
+%
+%
+filepath = '/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/projections/0_50/';
+sx_a   = 1800;
 sy_a   = 3584;
-slices = 62;
-%sx_b   = 3150;
-%sy_b   = 1465;
-sx_b = 3200;
-sy_b = 1600;
-volume_name   = 'CE-23_3200x1600_62_1.raw';
+slices = 50;
+sx_b   = 2400;
+sy_b   = 1100;
+volume_name   = 'CE_2400x1100_50.raw';
 offdetector_height = 55;
-
 
 
 
@@ -92,8 +101,8 @@ offdetector_height = 55;
 % VARIABLE                                   DESCRIPTION                    UNITS
 %-------------------------------------------------------------------------------------
 
-anglefile       = strcat(filepath, 'LE_proj/angles.ini');
-projections_dir = strcat(filepath, 'LE_proj/Projections_Renamed_Seg');
+anglefile       = strcat(filepath, 'angles.ini');
+projections_dir = strcat(filepath, 'Projections_Renamed_Seg');
 volume_path     = strcat(filepath,  volume_name); 
 
 
@@ -126,17 +135,17 @@ geo.accuracy    = 0.1;                           % Accuracy of FWD proj         
 geo.mode        = 'cone';
 geo.rotDetector = [0;0;0]; 
 
-fid    = fopen(anglefile, 'r');
-angles = fread(fid, 25, 'float');
-angles = angles';
-
+%fid    = fopen(anglefile, 'r');
+%angles = fread(fid, 25, 'float');
+%angles = angles';
+angles = linspace(-25*pi/180, 25*pi/180, 25);
 
 geo = staticDetectorGeo(geo, angles, offdetector_height);
 %disp(geo.DSD);
 
 %% Load data and generate projections
 
-%angles = linspace(-25*pi/180, 25*pi/180, 25);
+
 
 noise_projections = zeros(sx_a, sy_a, 25, 'double');
 files             = dir(projections_dir);
@@ -176,7 +185,7 @@ alpha=0.001;
 %   'TViter':      Defines the amount of TV iterations performed per SART
 %                  iteration. Default is 20
 
-ng=10;
+ng=5;
 
 % Other optional parameters
 % ----------------------------------------------
@@ -187,7 +196,7 @@ ng=10;
 %                  lambda=lambdared*lambda. Default is 0.99
 %
 lambda=1;
-lambdared=0.7;
+lambdared=0.9;
 
 
 %   'alpha_red':   Defines the reduction rate of the TV hyperparameter
@@ -196,8 +205,8 @@ alpha_red=0.95;
 %   'Ratio':       The maximum allowed image/TV update ration. If the TV 
 %                  update changes the image more than this, the parameter
 %                  will be reduced.default is 0.95
-ratio=0.7;
-verb=true;
+ratio = 0.9;
+verb  = true;
 
 
 imgOSASDPOCS = AwASD_POCS(noise_projections, geo, angles, 5,...
