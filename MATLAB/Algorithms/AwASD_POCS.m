@@ -111,7 +111,8 @@ iter=0;
 offOrigin=geo.offOrigin;
 offDetector=geo.offDetector;
 rotDetector=geo.rotDetector;
-
+DSD = geo.DSD;
+DSO = geo.DSO;
 
 while ~stop_criteria %POCS
     f0=f;
@@ -318,7 +319,7 @@ for ii=1:length(opts)
             %  =========================================================================
         case 'maxl2err'
             if default
-                epsilon=im3Dnorm(FDK(proj,geo,angles))*0.2; %heuristic
+                epsilon=im3Dnorm(FDK(proj,geo,angles), 'L2')*0.2; %heuristic
             else
                 epsilon=val;
             end
