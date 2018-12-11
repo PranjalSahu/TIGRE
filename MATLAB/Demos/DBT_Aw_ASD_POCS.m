@@ -84,14 +84,14 @@ close all;
 % offdetector_height = 55;
 %
 %
-filepath = '/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/projections/0_50/';
+filepath = '/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/projections/70_250/';
 sx_a   = 1800;
 sy_a   = 3584;
 slices = 50;
 sx_b   = 2400;
 sy_b   = 1100;
 volume_name   = 'CE_2400x1100_50.raw';
-offdetector_height = 55;
+offdetector_height = 15;
 
 
 

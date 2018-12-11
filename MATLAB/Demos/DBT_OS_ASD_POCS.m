@@ -72,18 +72,26 @@ close all;
 %
 %
 % Settings for CE-23 (Works with 3200x1600 and no 3150x1465)
-filepath = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE23/';
-sx_a   = 1600;
+% filepath = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE23/';
+% sx_a   = 1600;
+% sy_a   = 3584;
+% slices = 62;
+% %sx_b   = 3150;
+% %sy_b   = 1465;
+% sx_b = 3200;
+% sy_b = 1600;
+% volume_name   = 'CE-23_3200x1600_62_1.raw';
+% offdetector_height = 55;
+%
+%
+filepath = '/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/projections/70_250/';
+sx_a   = 1800;
 sy_a   = 3584;
-slices = 62;
-%sx_b   = 3150;
-%sy_b   = 1465;
-sx_b = 3200;
-sy_b = 1600;
-volume_name   = 'CE-23_3200x1600_62_1.raw';
-offdetector_height = 55;
-
-
+slices = 50;
+sx_b   = 2400;
+sy_b   = 1100;
+volume_name   = 'CE_2400x1100_50.raw';
+offdetector_height = 15;
 
 
 
@@ -92,8 +100,8 @@ offdetector_height = 55;
 % VARIABLE                                   DESCRIPTION                    UNITS
 %-------------------------------------------------------------------------------------
 
-anglefile       = strcat(filepath, 'LE_proj/angles.ini');
-projections_dir = strcat(filepath, 'LE_proj/Projections_Renamed_Seg');
+anglefile       = strcat(filepath, 'angles.ini');
+projections_dir = strcat(filepath, 'Projections_Renamed_Seg');
 volume_path     = strcat(filepath,  volume_name); 
 
 
@@ -126,10 +134,10 @@ geo.accuracy    = 0.1;                           % Accuracy of FWD proj         
 geo.mode        = 'cone';
 geo.rotDetector = [0;0;0]; 
 
-fid    = fopen(anglefile, 'r');
-angles = fread(fid, 25, 'float');
-angles = angles';
-
+%fid    = fopen(anglefile, 'r');
+%angles = fread(fid, 25, 'float');
+%angles = angles';
+angles = linspace(-25*pi/180, 25*pi/180, 25);
 
 geo = staticDetectorGeo(geo, angles, offdetector_height);
 %disp(geo.DSD);
