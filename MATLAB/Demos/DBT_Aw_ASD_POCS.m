@@ -14,14 +14,14 @@ close all;
 % 
 %
 % Settings for CE-12 (Working with 9.1 and compute 30)
-% filepath = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE12/';
-% sx_a   = 1800;
-% sy_a   = 3584;
-% slices = 46;
-% sx_b   = 2600;
-% sy_b   = 1300;
-% volume_name   = 'CE-12_2600x1300_46.raw';
-% offdetector_height = 35;
+filepath = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE12/';
+sx_a   = 1800;
+sy_a   = 3584;
+slices = 46;
+sx_b   = 2600;
+sy_b   = 1300;
+volume_name   = 'CE-12_2600x1300_46.raw';
+offdetector_height = 35;
 %
 % % Settings for CE-14 (Working with 9.1 and compute 30)
 % filepath = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE14/';
@@ -84,14 +84,14 @@ close all;
 % offdetector_height = 55;
 %
 %
-filepath = '/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/projections/70_250/';
-sx_a   = 1800;
-sy_a   = 3584;
-slices = 50;
-sx_b   = 2400;
-sy_b   = 1100;
-volume_name   = 'CE_2400x1100_50.raw';
-offdetector_height = 15;
+% filepath = '/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/projections/70_250/';
+% sx_a   = 1800;
+% sy_a   = 3584;
+% slices = 50;
+% sx_b   = 2400;
+% sy_b   = 1100;
+% volume_name   = 'CE_2400x1100_50_5.raw';
+% offdetector_height = 15;
 
 
 
@@ -102,7 +102,7 @@ offdetector_height = 15;
 %-------------------------------------------------------------------------------------
 
 anglefile       = strcat(filepath, 'angles.ini');
-projections_dir = strcat(filepath, 'Projections_Renamed_Seg');
+projections_dir = strcat(filepath, 'Projections/Projections_Renamed_Seg');
 volume_path     = strcat(filepath,  volume_name); 
 
 
@@ -180,12 +180,12 @@ noise_projections = single(noise_projections);
 
 
 
-alpha=0.001;
+alpha=0.01;
 
 %   'TViter':      Defines the amount of TV iterations performed per SART
 %                  iteration. Default is 20
 
-ng=5;
+ng=25;
 
 % Other optional parameters
 % ----------------------------------------------
