@@ -1,4 +1,4 @@
-function [ f,qualMeasOut]= AwASD_POCS(proj,geo,angles,maxiter,varargin)
+function [ f,qualMeasOut]= AwASD_POCS(proj,geo,angles,mask,maxiter,varargin)
 %AwASD_POCS Solves the 3D tomography problem using the adaptive-weighted
 %ASD_POCS algorithm which extends from the method ASD_POCS available in the
 %TIGRE toolbox by adding weight equation to better preserve the edge of the
@@ -114,6 +114,7 @@ rotDetector=geo.rotDetector;
 DSD = geo.DSD;
 DSO = geo.DSO;
 
+
 while ~stop_criteria %POCS
     f0=f;
     if (iter==0 && verbose==1);tic;end
@@ -135,7 +136,19 @@ while ~stop_criteria %POCS
         if size(DSO,2)==size(angles,2)
             geo.DSO=DSO(jj);
         end
-        f=f+beta* bsxfun(@times,1./V(:,:,jj),Atb(W(:,:,jj).*(proj(:,:,index_angles(:,jj))-Ax(f,geo,angles(:,jj))),geo,angles(:,jj)));
+        
+        % Added the Binary mask of the breast volume to reduce the boundary
+        % artifacts
+        temp1 = Ax(f,geo,angles(:,jj));
+        temp2 = Atb(W(:,:,jj).*(proj(:,:,index_angles(:,jj))-temp1), geo,angles(:,jj));
+        temp3 = mask.*temp2;
+        temp  = bsxfun(@times,1./V(:,:,jj), temp3);
+        
+        %disp(size(temp));
+        %disp(size(f));
+        
+        %tempa = bsxfun(@times, mask(:, :, jj), temp);
+        f=f+beta*temp;
         f(f<0)=0;
     end
     

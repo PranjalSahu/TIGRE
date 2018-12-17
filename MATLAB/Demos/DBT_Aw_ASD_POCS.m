@@ -158,6 +158,7 @@ for t=3:27
   c   = fread(fid, sx_a*sy_a, 'float');
   cb  = reshape(c, [sy_a, sx_a]);
   cb = cb';
+  %cb = rot90(rot90(cb));
   noise_projections(:, :, t-2) = cb;
 end
 
@@ -208,8 +209,10 @@ alpha_red=0.95;
 ratio = 0.9;
 verb  = true;
 
+imgFDK = FDK(noise_projections, geo, angles);
+mask   = getmask(imgFDK);
 
-imgOSASDPOCS = AwASD_POCS(noise_projections, geo, angles, 5,...
+imgOSASDPOCS = AwASD_POCS(noise_projections, geo, angles, mask, 1,...
                      'TViter', ng, 'alpha', alpha,... % these are very important
                      'lambda',lambda,'lambda_red',lambdared,'Ratio',ratio,'Verbose',verb,...% less important.
                      'OrderStrategy','random'); %OSC options
