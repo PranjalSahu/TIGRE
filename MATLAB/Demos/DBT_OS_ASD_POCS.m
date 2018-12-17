@@ -20,7 +20,7 @@ sy_a   = 3584;
 slices = 46;
 sx_b   = 2600;
 sy_b   = 1300;
-volume_name   = 'CE-12_2600x1300_46_os_asd_pocs1.raw';
+volume_name   = 'CE-12_2600x1300_46_os_asd_pocs3.raw';
 offdetector_height = 35;
 %
 % % Settings for CE-14 (Working with 9.1 and compute 30)
@@ -184,7 +184,7 @@ alpha=0.2;
 %   'TViter':      Defines the amount of TV iterations performed per SART
 %                  iteration. Default is 20
 
-ng=50;
+ng=5;
 
 % Other optional parameters
 % ----------------------------------------------
@@ -204,7 +204,7 @@ alpha_red=0.95;
 %   'Ratio':       The maximum allowed image/TV update ration. If the TV 
 %                  update changes the image more than this, the parameter
 %                  will be reduced.default is 0.95
-ratio=0.7;
+ratio=0.1;
 verb=true;
 
 
