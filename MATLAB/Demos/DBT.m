@@ -164,17 +164,14 @@ noise_projections = zeros(sx_a, sy_a, 25, 'double');
 files             = dir(projections_dir);
 
 disp(size(files));
-%disp(files(1));
-%disp(files(2));
 
 for t=3:27
   disp(strcat(files(t).folder, '/', files(t).name))
   fid = fopen(strcat(files(t).folder, '/', files(t).name), 'r');
   c   = fread(fid, sx_a*sy_a, 'float');
   cb  = reshape(c, [sy_a, sx_a]);
-  %cb  = imresize(cb, 0.25);
   cb  = cb';
-  cb = rot90(rot90(cb));
+  cb  = rot90(rot90(cb));
   noise_projections(:, :, t-2) = cb;
 end
 
@@ -198,33 +195,16 @@ for t=1:slices
     if t >10 && t < 40
         st   = regionprops(BW, 'BoundingBox' );
         area = st(1).BoundingBox(3)*st(1).BoundingBox(4);
-        
         if area > maxarea
             maxarea = area;
             bbox = st(1);
         end
-        %figure, imshow(temp(:, :, t)*10);
         
-        
-        %for k = 1 : length(st)
-        %     thisBB = st(k).BoundingBox;
-        %     rectangle('Position', [thisBB(1),thisBB(2),thisBB(3),thisBB(4)],...
-        %    'EdgeColor','r','LineWidth',2 )
-        %end
     end
 end
 
 temp = temp(1:bbox.BoundingBox(4), 1:bbox.BoundingBox(3), :);
-%disp(size(temp));
 
 fid = fopen(volume_path, 'w+');
 cnt = fwrite(fid, temp, 'float');
 fclose(fid);
-
-
-
-% for t=1:slices
-%     level            = graythresh(temp(:, :, t));
-%     BW               = imbinarize(temp(:, :, t), level);
-%     temp(:, :, t)    = BW.*temp(:, :, t);
-% end
