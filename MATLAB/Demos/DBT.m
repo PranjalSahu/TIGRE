@@ -193,3 +193,10 @@ fid = fopen(volume_path, 'w+');
 cnt = fwrite(fid, temp, 'float');
 fclose(fid);
 
+
+
+% for t=1:slices
+%     level            = graythresh(temp(:, :, t));
+%     BW               = imbinarize(temp(:, :, t), level);
+%     temp(:, :, t)    = BW.*temp(:, :, t);
+% end
