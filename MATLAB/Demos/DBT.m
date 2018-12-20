@@ -75,7 +75,7 @@ close all;
 % offdetector_height = 55;
 %
 % % Synthetic Data
-filepath = '/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/projections/70_250/';
+filepath = '/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/projections/69_250/';
 sx_a   = 1800;
 sy_a   = 3584;
 slices = 50; %50;
@@ -203,7 +203,10 @@ for t=1:slices
     end
 end
 
-temp = temp(1:bbox.BoundingBox(4), 1:bbox.BoundingBox(3), :);
+disp(bbox.BoundingBox);
+temp = temp(ceil(bbox.BoundingBox(1)):bbox.BoundingBox(4), ceil(bbox.BoundingBox(2)):bbox.BoundingBox(3), :);
+disp('Recon Volume size is');
+disp(size(temp));
 
 fid = fopen(volume_path, 'w+');
 cnt = fwrite(fid, temp, 'float');
