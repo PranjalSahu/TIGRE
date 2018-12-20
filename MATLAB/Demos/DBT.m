@@ -17,10 +17,11 @@ close all;
 % filepath = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE12/';
 % sx_a   = 1800;
 % sy_a   = 3584;
-% slices = 46;
+% slices = 541;%46;
 % sx_b   = 2600;
 % sy_b   = 1300;
-% volume_name   = 'CE-12_2600x1300_46.raw';
+% volume_name   = 'CE-12_2600x1300_46_sart-1.raw';
+% offdetector_height = 35;
 % 
 %
 % % Settings for CE-14
@@ -73,16 +74,37 @@ close all;
 % volume_name   = 'CE-23_3150x1465_62.raw';
 % offdetector_height = 55;
 %
-%
+% % Synthetic Data
 filepath = '/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/projections/70_250/';
 sx_a   = 1800;
 sy_a   = 3584;
-slices = 50;
+slices = 50; %50;
 sx_b   = 2400;
-sy_b   = 1100;
-volume_name   = 'CE_2400x1100_50.raw';
-offdetector_height = 15;
+sy_b   = 840;
+volume_name   = 'CE_2400x840_249_5.raw';
+offdetector_height = 76;
+%
+% Synthetic Data downsampled (Does not work)
+% filepath = '/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/projections/70_250/';
+% sx_a   = 450;
+% sy_a   = 896;
+% slices = 249; %50;
+% sx_b   = 600;
+% sy_b   = 280;
+% volume_name   = 'CE_600x280_249.raw';
+% offdetector_height = 15;
 
+%
+% % Settings for CE-26
+%filepath = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE26/RE_diff/';
+% filepath  = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE26/T_PR_RAW_R-CC_DIAGNOSIS_0003/' ;
+% sx_a   = 860;
+% sy_a   = 3584;
+% slices = 58;
+% sx_b   = 2810;
+% sy_b   = 860;
+% volume_name   = 'CE_2810x860_58_1.raw';
+% offdetector_height = 35;
 
 
 
@@ -91,7 +113,7 @@ offdetector_height = 15;
 % VARIABLE                                   DESCRIPTION                    UNITS
 %-------------------------------------------------------------------------------------
 
-anglefile       = strcat(filepath, 'LE_proj/angles.ini');
+anglefile       = strcat(filepath, 'angles.ini');
 projections_dir = strcat(filepath, 'Projections_Renamed_Seg');
 volume_path     = strcat(filepath,  volume_name); 
 
@@ -129,6 +151,7 @@ geo.rotDetector = [0;0;0];
 %angles = fread(fid, 25, 'float');
 %angles = angles';
 angles = linspace(-25*pi/180, 25*pi/180, 25);
+angles = fliplr(angles);
 
 
 geo = staticDetectorGeo(geo, angles, offdetector_height);
@@ -140,7 +163,7 @@ geo = staticDetectorGeo(geo, angles, offdetector_height);
 noise_projections = zeros(sx_a, sy_a, 25, 'double');
 files             = dir(projections_dir);
 
-%disp(size(files));
+disp(size(files));
 %disp(files(1));
 %disp(files(2));
 
@@ -149,11 +172,14 @@ for t=3:27
   fid = fopen(strcat(files(t).folder, '/', files(t).name), 'r');
   c   = fread(fid, sx_a*sy_a, 'float');
   cb  = reshape(c, [sy_a, sx_a]);
-  cb = cb';
+  %cb  = imresize(cb, 0.25);
+  cb  = cb';
+  cb = rot90(rot90(cb));
   noise_projections(:, :, t-2) = cb;
 end
 
 noise_projections = single(noise_projections);
+
 
 %% Lets create a SART test for comparison
 [recSART,  errL2SART] = SART(noise_projections, geo, angles, 1, 'OrderStrategy', 'random');
