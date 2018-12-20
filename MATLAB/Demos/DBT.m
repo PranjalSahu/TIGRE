@@ -82,7 +82,7 @@ slices = 50; %50;
 sx_b   = 2400;
 sy_b   = 840;
 volume_name   = 'CE_2400x840_249_5.raw';
-offdetector_height = 76;
+offdetector_height = 75;
 %
 % Synthetic Data downsampled (Does not work)
 % filepath = '/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/projections/70_250/';
@@ -187,7 +187,30 @@ noise_projections = single(noise_projections);
 temp = zeros(sx_b, sy_b, slices, 'double');
 for t=1:slices
     temp(:, :, t)  = recSART(t, :, :);
+    level            = graythresh(temp(:, :, t));
+    BW               = imbinarize(temp(:, :, t), level);
+    BW               = bwareaopen(BW, 504000);
+    temp(:, :, t)    = BW.*temp(:, :, t);
+    
+    %if t == 50
+        figure, imshow(temp(:, :, t)*10);
+        st = regionprops(BW, 'BoundingBox' );
+        
+        for k = 1 : length(st)
+             thisBB = st(k).BoundingBox;
+             rectangle('Position', [thisBB(1),thisBB(2),thisBB(3),thisBB(4)],...
+            'EdgeColor','r','LineWidth',2 )
+        end
+    %end
 end
+
+
+% for k = 1 : length(st)
+%   thisBB = st(k).BoundingBox;
+%   rectangle('Position', [thisBB(1),thisBB(2),thisBB(3),thisBB(4)],...
+%   'EdgeColor','r','LineWidth',2 )
+% end
+
 
 fid = fopen(volume_path, 'w+');
 cnt = fwrite(fid, temp, 'float');
