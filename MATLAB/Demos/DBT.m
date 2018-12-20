@@ -184,7 +184,10 @@ noise_projections = single(noise_projections);
 %% Lets create a SART test for comparison
 [recSART,  errL2SART] = SART(noise_projections, geo, angles, 1, 'OrderStrategy', 'random');
 
-temp = zeros(sx_b, sy_b, slices, 'double');
+temp    = zeros(sx_b, sy_b, slices, 'double');
+maxarea = 0;
+bbox    = [];
+
 for t=1:slices
     temp(:, :, t)  = recSART(t, :, :);
     level            = graythresh(temp(:, :, t));
@@ -192,25 +195,27 @@ for t=1:slices
     BW               = bwareaopen(BW, 504000);
     temp(:, :, t)    = BW.*temp(:, :, t);
     
-    %if t == 50
-        figure, imshow(temp(:, :, t)*10);
-        st = regionprops(BW, 'BoundingBox' );
+    if t >10 && t < 40
+        st   = regionprops(BW, 'BoundingBox' );
+        area = st(1).BoundingBox(3)*st(1).BoundingBox(4);
         
-        for k = 1 : length(st)
-             thisBB = st(k).BoundingBox;
-             rectangle('Position', [thisBB(1),thisBB(2),thisBB(3),thisBB(4)],...
-            'EdgeColor','r','LineWidth',2 )
+        if area > maxarea
+            maxarea = area;
+            bbox = st(1);
         end
-    %end
+        %figure, imshow(temp(:, :, t)*10);
+        
+        
+        %for k = 1 : length(st)
+        %     thisBB = st(k).BoundingBox;
+        %     rectangle('Position', [thisBB(1),thisBB(2),thisBB(3),thisBB(4)],...
+        %    'EdgeColor','r','LineWidth',2 )
+        %end
+    end
 end
 
-
-% for k = 1 : length(st)
-%   thisBB = st(k).BoundingBox;
-%   rectangle('Position', [thisBB(1),thisBB(2),thisBB(3),thisBB(4)],...
-%   'EdgeColor','r','LineWidth',2 )
-% end
-
+temp = temp(1:bbox.BoundingBox(4), 1:bbox.BoundingBox(3), :);
+%disp(size(temp));
 
 fid = fopen(volume_path, 'w+');
 cnt = fwrite(fid, temp, 'float');
