@@ -81,7 +81,7 @@ sy_a   = 3584;
 slices = 50; %50;
 sx_b   = 2400;
 sy_b   = 840;
-volume_name   = 'CE_2400x840_249_5.raw';
+volume_name   = 'CE_2400x840_249_9.raw';
 offdetector_height = 75;
 %
 % Synthetic Data downsampled (Does not work)
@@ -185,26 +185,60 @@ temp    = zeros(sx_b, sy_b, slices, 'double');
 maxarea = 0;
 bbox    = [];
 
+tl_x = 10000000;
+tl_y = 10000000;
+br_x = -1;
+br_y = -1;
+
 for t=1:slices
-    temp(:, :, t)  = recSART(t, :, :);
+    temp(:, :, t)    = recSART(t, :, :);
     level            = graythresh(temp(:, :, t));
     BW               = imbinarize(temp(:, :, t), level);
     BW               = bwareaopen(BW, 504000);
     temp(:, :, t)    = BW.*temp(:, :, t);
     
-    if t >10 && t < 40
+    if t > 20 && t < 30
         st   = regionprops(BW, 'BoundingBox' );
-        area = st(1).BoundingBox(3)*st(1).BoundingBox(4);
-        if area > maxarea
-            maxarea = area;
-            bbox = st(1);
+        
+        disp(st(1).BoundingBox);
+        
+        if tl_x > st(1).BoundingBox(1)
+            tl_x = ceil(st(1).BoundingBox(1));
         end
+        
+        if tl_y > st(1).BoundingBox(2)
+            tl_y = ceil(st(1).BoundingBox(2));
+        end
+        
+        if br_x < st(1).BoundingBox(3)
+            br_x = ceil(st(1).BoundingBox(3));
+        end
+        
+        if br_y < st(1).BoundingBox(4)
+            br_y = ceil(st(1).BoundingBox(4));
+        end
+        
+        %area = st(1).BoundingBox(3)*st(1).BoundingBox(4);
+        
+        %disp(t);
+        %disp(area);
+            
+        %if area > maxarea
+        %    maxarea = area;
+        %    bbox    = st(1);
+        %end
         
     end
 end
 
-disp(bbox.BoundingBox);
-temp = temp(ceil(bbox.BoundingBox(1)):bbox.BoundingBox(4), ceil(bbox.BoundingBox(2)):bbox.BoundingBox(3), :);
+disp(tl_x);
+disp(tl_y);
+disp(br_x);
+disp(br_y);
+
+%temp = temp(ceil(bbox.BoundingBox(1)):bbox.BoundingBox(4), ceil(bbox.BoundingBox(2)):bbox.BoundingBox(3), :);
+temp = temp(tl_y:br_y,tl_x:br_x,  :);
+temp = flip(temp, 3);
 disp('Recon Volume size is');
 disp(size(temp));
 
