@@ -75,14 +75,15 @@ close all;
 % offdetector_height = 55;
 %
 % % Synthetic Data
-filepath = '/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/projections/69_250/';
-sx_a   = 1800;
-sy_a   = 3584;
+filepath = 'C:\\Users\\psahu\\TESTBED\\projections\\44_250\\';
+sx_a   = 1000;
+sy_a   = 3600;
 slices = 50; %50;
 sx_b   = 2400;
 sy_b   = 840;
 volume_name   = 'CE_2400x840_249_10.raw';
 offdetector_height = 75;
+
 %
 % Synthetic Data downsampled (Does not work)
 % filepath = '/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/projections/70_250/';
@@ -147,10 +148,12 @@ geo.accuracy    = 0.1;                           % Accuracy of FWD proj         
 geo.mode        = 'cone';
 geo.rotDetector = [0;0;0]; 
 
+TotalAngles = 25;
+
 %fid    = fopen(anglefile, 'r');
 %angles = fread(fid, 25, 'float');
 %angles = angles';
-angles = linspace(-25*pi/180, 25*pi/180, 25);
+angles = linspace(-25*pi/180, 25*pi/180, TotalAngles);
 angles = fliplr(angles);
 
 
@@ -160,7 +163,7 @@ geo = staticDetectorGeo(geo, angles, offdetector_height);
 %% Load data and generate projections
 
 
-noise_projections = zeros(sx_a, sy_a, 25, 'double');
+noise_projections = zeros(sx_a, sy_a, size(angles, 2), 'double');
 files             = dir(projections_dir);
 
 disp(size(files));
@@ -197,27 +200,38 @@ for t=1:slices
     BW               = bwareaopen(BW, 504000);
     temp(:, :, t)    = BW.*temp(:, :, t);
     
-    if t > 20 && t < 30
-        st   = regionprops(BW, 'BoundingBox' );
-        
-        %disp(st(1).BoundingBox);
-        
-        if tl_x > st(1).BoundingBox(1)
-            tl_x = ceil(st(1).BoundingBox(1));
-        end
-        
-        if tl_y > st(1).BoundingBox(2)
-            tl_y = ceil(st(1).BoundingBox(2));
-        end
-        
-        if br_x < st(1).BoundingBox(3)
-            br_x = ceil(st(1).BoundingBox(3));
-        end
-        
-        if br_y < st(1).BoundingBox(4)
-            br_y = ceil(st(1).BoundingBox(4));
-        end
-    end
+%     if t > 20 && t < 30
+%         st   = regionprops(BW, 'BoundingBox' );
+%         
+%         disp(st(1).BoundingBox);
+%         
+%         if tl_x > st(1).BoundingBox(1)
+%             tl_x = ceil(st(1).BoundingBox(1));
+%         end
+%         
+%         if tl_y > st(1).BoundingBox(2)
+%             tl_y = ceil(st(1).BoundingBox(2));
+%         end
+%         
+%         if br_x < st(1).BoundingBox(3)
+%             br_x = ceil(st(1).BoundingBox(3));
+%         end
+%         
+%         if br_y < st(1).BoundingBox(4)
+%             br_y = ceil(st(1).BoundingBox(4));
+%         end
+%         
+%         %area = st(1).BoundingBox(3)*st(1).BoundingBox(4);
+%         
+%         %disp(t);
+%         %disp(area);
+%             
+%         %if area > maxarea
+%         %    maxarea = area;
+%         %    bbox    = st(1);
+%         %end
+%         
+%     end
 end
 
 disp(tl_x);
@@ -226,7 +240,7 @@ disp(br_x);
 disp(br_y);
 
 %temp = temp(ceil(bbox.BoundingBox(1)):bbox.BoundingBox(4), ceil(bbox.BoundingBox(2)):bbox.BoundingBox(3), :);
-temp = temp(tl_y:br_y,tl_x:br_x,  :);
+%temp = temp(tl_y:br_y,tl_x:br_x,  :);
 temp = flip(temp, 3);
 disp('Recon Volume size is');
 disp(size(temp));
