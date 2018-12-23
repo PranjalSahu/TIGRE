@@ -160,7 +160,7 @@ for t=3:27
   fid = fopen(strcat(files(t).folder, '/', files(t).name), 'r');
   c   = fread(fid, sx_a*sy_a, 'float');
   cb  = reshape(c, [sy_a, sx_a]);
-  cb = cb';
+  cb  = cb';
   %cb = rot90(rot90(cb));
   noise_projections(:, :, t-2) = cb;
 end

@@ -73,7 +73,7 @@ function [res,errorL2,qualMeasOut]=OS_SART(proj,geo,angles,niter,varargin)
 measurequality=~isempty(QualMeasOpts);
 
 blocksize = 5;
-OrderStrategy = 'ordered';
+%OrderStrategy = 'ordered';
 %disp(geo.mode)
 %disp(OrderStrategy)
 

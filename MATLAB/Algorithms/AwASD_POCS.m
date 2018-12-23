@@ -191,10 +191,12 @@ while ~stop_criteria %POCS
     % compute change by TV min
     dg_vec=(f-f0);
     dg=im3Dnorm(dg_vec,'L2');
+    
     % if change in TV is bigger than the change in SART AND image error is still bigger than acceptable
     if dg>rmax*dp && dd>epsilon
         dtvg=dtvg*alpha_red;
     end
+    
     % reduce SART step
     beta=beta*beta_red;
     % Check convergence criteria
@@ -229,6 +231,8 @@ end
 function [beta,beta_red,ng,verbose,alpha,alpha_red,rmax,epsilon,delta,OrderStrategy,QualMeasOpts]=parse_inputs(proj,geo,angles,argin)
 opts=     {'lambda','lambda_red','tviter','verbose','alpha','alpha_red','ratio','maxl2err','delta','orderstrategy','qualmeas'};
 defaults=ones(length(opts),1);
+
+
 % Check inputs
 nVarargs = length(argin);
 if mod(nVarargs,2)

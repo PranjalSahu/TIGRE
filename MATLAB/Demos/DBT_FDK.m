@@ -14,14 +14,14 @@ close all;
 % 
 %
 % % Settings for CE-12
-filepath = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE12/';
-sx_a   = 1800;
-sy_a   = 3584;
-slices = 46;
-sx_b   = 2600;
-sy_b   = 1300;
-volume_name   = 'CE-12_2600x1300_46_fdk.raw';
-offdetector_height = 35;
+% filepath = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE12/';
+% sx_a   = 1800;
+% sy_a   = 3584;
+% slices = 46;
+% sx_b   = 2600;
+% sy_b   = 1300;
+% volume_name   = 'CE-12_2600x1300_46_fdk.raw';
+% offdetector_height = 35;
 % 
 %
 % % Settings for CE-14
@@ -94,7 +94,16 @@ offdetector_height = 35;
 % sy_b   = 860;
 % volume_name   = 'CE_2810x860_58_fdk.raw';
 % offdetector_height = 35;
-
+%
+%
+filepath = '/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/projections/69_250/';
+sx_a   = 1800;
+sy_a   = 3584;
+slices = 50; %50;
+sx_b   = 2400;
+sy_b   = 840;
+volume_name   = 'CE_2400x840_50_10.raw';
+offdetector_height = 75;
 
 
 %% Define Geometry
@@ -103,7 +112,7 @@ offdetector_height = 35;
 %-------------------------------------------------------------------------------------
 
 anglefile       = strcat(filepath, 'angles.ini');
-projections_dir = strcat(filepath, 'Projections/Projections_Renamed_Seg');
+projections_dir = strcat(filepath, 'Projections_Renamed_Seg');
 volume_path     = strcat(filepath,  volume_name); 
 
 
@@ -136,13 +145,14 @@ geo.accuracy    = 0.1;                           % Accuracy of FWD proj         
 geo.mode        = 'cone';
 geo.rotDetector = [0;0;0]; 
 
-fid    = fopen(anglefile, 'r');
-angles = fread(fid, 25, 'float');
-angles = angles';
-%angles = linspace(-25*pi/180, 25*pi/180, 25);
+% fid    = fopen(anglefile, 'r');
+% angles = fread(fid, 25, 'float');
+% angles = angles';
 
+angles = linspace(-25*pi/180, 25*pi/180, 25);
+angles = fliplr(angles);
 
-geo = staticDetectorGeo(geo, angles, offdetector_height);
+geo    = staticDetectorGeo(geo, angles, offdetector_height);
 %disp(geo.DSD);
 
 %% Load data and generate projections
@@ -161,18 +171,33 @@ for t=3:27
   c   = fread(fid, sx_a*sy_a, 'float');
   cb  = reshape(c, [sy_a, sx_a]);
   cb = cb';
+  cb  = rot90(rot90(cb));
   noise_projections(:, :, t-2) = cb;
 end
 
 noise_projections = single(noise_projections);
 
 %% Lets create a SART test for comparison
-imgFDK = FDK(noise_projections, geo, angles);
+imgFDK = FDK(noise_projections, geo, angles, 'filter','hann' );
+
 
 temp = zeros(sx_b, sy_b, slices, 'double');
+
+tl_x = 10000000;
+tl_y = 10000000;
+br_x = -1;
+br_y = -1;
+
 for t=1:slices
-    temp(:, :, t)  = imgFDK(t, :, :);
+    temp(:, :, t)    = imgFDK(t, :, :);
 end
+
+
+%temp = temp(tl_y:br_y,tl_x:br_x,  :);
+temp = flip(temp, 3);
+disp('Recon Volume size is');
+disp(size(temp));
+
 
 fid = fopen(volume_path, 'w+');
 cnt = fwrite(fid, temp, 'float');

@@ -161,9 +161,11 @@ while ~stop_criteria %POCS
     if measurequality
         qualMeasOut(:,iter) = Measure_Quality(f0, f, QualMeasOpts);
     end
+    
     % compute L2 error of actual image. Ax-b
-    g=Ax(f,geo,angles);
-    dd=im3Dnorm(g-proj(:,:,index_angles),'L2');
+    g  = Ax(f, geo, angles);
+    dd = im3Dnorm(g-proj(:,:,index_angles), 'L2');
+    
     % compute change in the image after last SART iteration
     dp_vec=(f-f0);
     dp=im3Dnorm(dp_vec,'L2');

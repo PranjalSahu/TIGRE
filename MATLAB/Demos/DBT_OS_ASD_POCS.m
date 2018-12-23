@@ -208,7 +208,7 @@ ratio=0.1;
 verb=true;
 
 
-imgOSASDPOCS = OS_ASD_POCS(noise_projections, geo, angles, 25,...
+imgOSASDPOCS = OS_ASD_POCS(noise_projections, geo, angles, 5,...
                      'TViter', ng, 'alpha', alpha,... % these are very important
                      'lambda',lambda,'lambda_red',lambdared,'Ratio',ratio,'Verbose',verb,...% less important.
                      'BlockSize', 5,'OrderStrategy','random'); %OSC options

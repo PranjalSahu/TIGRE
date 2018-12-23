@@ -13,6 +13,7 @@ close all;
 % volume_name   = 'CE-05_2200x1000_45.raw';
 % 
 %
+%
 % Settings for CE-12 (Working with 9.1 and compute 30)
 filepath = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE12/';
 sx_a   = 1800;
@@ -20,7 +21,7 @@ sy_a   = 3584;
 slices = 46;
 sx_b   = 2600;
 sy_b   = 1300;
-volume_name   = 'CE-12_2600x1300_46.raw';
+volume_name   = 'CE-12_2600x1300_46_8.raw';
 offdetector_height = 35;
 %
 % % Settings for CE-14 (Working with 9.1 and compute 30)
@@ -215,13 +216,15 @@ mask   = getmask(imgFDK);
 imgOSASDPOCS = AwASD_POCS(noise_projections, geo, angles, mask, 1,...
                      'TViter', ng, 'alpha', alpha,... % these are very important
                      'lambda',lambda,'lambda_red',lambdared,'Ratio',ratio,'Verbose',verb,...% less important.
-                     'OrderStrategy','random'); %OSC options
+                     'OrderStrategy','random', 'delta', 0.005); %OSC options
                  
 
 temp = zeros(sx_b, sy_b, slices, 'double');
 for t=1:slices
     temp(:, :, t)  = imgOSASDPOCS(t, :, :);
 end
+
+disp(volume_path);
 
 fid = fopen(volume_path, 'w+');
 cnt = fwrite(fid, temp, 'float');

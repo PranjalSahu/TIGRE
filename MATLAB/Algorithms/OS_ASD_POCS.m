@@ -98,20 +98,24 @@ clear A x y dx dz;
 
 
 % initialize image.
-f=zeros(geo.nVoxel','single');
+f = zeros(geo.nVoxel','single');
 
 
-stop_criteria=0;
-iter=0;
-offOrigin=geo.offOrigin;
-offDetector=geo.offDetector;
-rotDetector=geo.rotDetector;
-DSD=geo.DSD;
-DSO=geo.DSO;
+stop_criteria = 0;
+iter          = 0;
+offOrigin     = geo.offOrigin;
+offDetector   = geo.offDetector;
+rotDetector   = geo.rotDetector;
+DSD           = geo.DSD;
+DSO           = geo.DSO;
+
+
 while ~stop_criteria %POCS
     f0=f;
     if (iter==0 && verbose==1);tic;end
+    
     iter=iter+1;
+    
     for jj=1:length(alphablocks);
         % Get offsets
         if size(offOrigin,2)==size(angles,2)
@@ -145,29 +149,34 @@ while ~stop_criteria %POCS
         end
     end
     
-    geo.offDetector=offDetector;
-    geo.offOrigin=offOrigin;
-    geo.rotDetector=rotDetector;
-    geo.DSD=DSD;
+    geo.offDetector  = offDetector;
+    geo.offOrigin    = offOrigin;
+    geo.rotDetector  = rotDetector;
+    geo.DSD          = DSD;
     
     % Save copy of image.
     fres=f;
+    
     % compute L2 error of actual image. Ax-b
-    g=Ax(f,geo,angles);
-    dd=im3Dnorm(g-proj,'L2');
+    g  = Ax(f,geo,angles);
+    dd = im3Dnorm(g-proj, 'L2');
+    
     % compute change in the image after last SART iteration
-    dp_vec=(f-f0);
-    dp=im3Dnorm(dp_vec,'L2');
+    dp_vec = (f-f0);
+    dp     = im3Dnorm(dp_vec, 'L2');
+    
+    disp('alpha');
+    disp(dp);
     
     if iter==1
-        dtvg=alpha*dp;
+        dtvg = alpha*dp;
     end
     f0=f;
     
     %  TV MINIMIZATION
     % =========================================================================
     %  Call GPU to minimize TV
-    f=minimizeTV(f0,dtvg,ng);    %   This is the MATLAB CODE, the functions are sill in the library, but CUDA is used nowadays
+    f = minimizeTV(f0, dtvg, ng);    %   This is the MATLAB CODE, the functions are sill in the library, but CUDA is used nowadays
     %                                             for ii=1:ng
     % %                                                 Steepest descend of TV norm
     %                                                 tv(ng*(iter-1)+ii)=im3Dnorm(f,'TV','forward');
@@ -180,14 +189,16 @@ while ~stop_criteria %POCS
     % ==========================================================================
     
     % compute change by TV min
-    dg_vec=(f-f0);
-    dg=im3Dnorm(dg_vec,'L2');
+    dg_vec = (f-f0);
+    dg     = im3Dnorm(dg_vec,'L2');
+    
     % if change in TV is bigger than the change in SART AND image error is still bigger than acceptable
     if dg>rmax*dp && dd>epsilon
-        dtvg=dtvg*alpha_red;
+        dtvg = dtvg*alpha_red;
     end
+    
     % reduce SART step
-    beta=beta*beta_red;
+    beta = beta*beta_red;
     % Check convergence criteria
     % ==========================================================================
     

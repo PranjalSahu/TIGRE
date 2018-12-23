@@ -86,6 +86,7 @@ noise_projections=addCTnoise(projections);
 %                  
 % its called epsilon in the paper
 epsilon=errL2OSSART(end);
+disp(epsilon)
 %   'alpha':       Defines the TV hyperparameter. default is 0.002. 
 %                  However the paper mentions 0.2 as good choice
 alpha=0.002;

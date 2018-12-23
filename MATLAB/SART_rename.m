@@ -1,9 +1,9 @@
 %% Function to rename projection images for SART Recon
 % HHuang add 'crop_column= '. 10/04/2016
 clear; clc
-projDir     = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE23/LE_proj';
-projSubName = 'CE23';
-crop_column = 1600;
+projDir     = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE26/T_PR_RAW_R-CC_DIAGNOSIS_0003';
+projSubName = 'CE26';
+crop_column = 860;
 
 outputDir = fullfile(projDir, 'Projections_Renamed_Seg'); % auto make output dir
 
