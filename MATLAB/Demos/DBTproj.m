@@ -3,7 +3,7 @@ clc;clear;close all
 
 filepath = 'C:\\Users\\psahu\\TESTBED\\projections\\44_350\\';
 sx_a   = 1000;
-sy_a   = 3600;
+sy_a   = 6000;
 slices = 249;
 sx_b   = 939;
 sy_b   = 329;
@@ -40,7 +40,7 @@ geo.accuracy    = 0.1;                           % Accuracy of FWD proj         
 geo.mode        = 'cone';
 geo.rotDetector = [0;0;0]; 
  
-TotalAngles = 55;
+TotalAngles = 65;
  
 
 angles = linspace(-TotalAngles*pi/180, TotalAngles*pi/180, TotalAngles);
@@ -64,7 +64,9 @@ projections = Ax(head, geo, angles,'interpolated');
 recFDK = FDK( projections,geo,angles);
 % 
 % %% SART
- %recSART = SART(projections,geo,angles,2,'OrderStrategy','ordered');
+mask    = head>0; 
+%recSART = SART_with_mask(projections,geo,angles,1,mask,'OrderStrategy','ordered');
+%recSART = SART(projections,geo,angles,1,'OrderStrategy','ordered');
 % 
 % %% plot
 % plotImg([recFDK recSART],'dim','x','clims',[0 1])
