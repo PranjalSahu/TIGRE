@@ -2,7 +2,8 @@ function phantom=readphantom(path, phantomshape)
     fid  = fopen(path, 'r');
     data = fread(fid, phantomshape(1)*phantomshape(2)*phantomshape(3), 'char');  %change the shape of phantom 
     phantom = reshape(data, [phantomshape(1), phantomshape(2), phantomshape(3)]);
-    phantom = permute(phantom, [3  1 2]);
+    phantom = permute(phantom, [2 1 3]);
+    phantom = permute(phantom, [1 3 2]);
 end
 
 
