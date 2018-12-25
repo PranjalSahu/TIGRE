@@ -1,9 +1,25 @@
 lgraph = get_unet();
 
+%[xtrain, ytrain, xvalid, yvalid] = read_train(25, 3);
 
+% options = trainingOptions('sgdm', 'LearnRateSchedule', 'piecewise', 'LearnRateDropPeriod', 500, ...
+%     'InitialLearnRate',0.0001, 'LearnRateDropFactor', 0.4,...
+%     'Verbose',false,...
+%     'Plots','training-progress',...
+%     'Shuffle', 'every-epoch', 'MaxEpochs', 100000, 'MiniBatchSize', 24, 'ValidationData',{xvalid, yvalid});
+
+options = trainingOptions('adam', 'LearnRateSchedule', 'piecewise', 'LearnRateDropPeriod', 2000,...
+    'InitialLearnRate',0.0001,'LearnRateDropFactor', 0.5,...
+    'Verbose',false,...
+    'Plots','training-progress',...
+    'Shuffle', 'every-epoch', 'MaxEpochs', 10000, 'MiniBatchSize', 24, 'ValidationData',{xvalid, yvalid});
+
+disp('Training data reading complete');
+
+[net, info]            = trainNetwork(xtrain, ytrain, lgraph, options);
 
 function lgraph=get_unet()
-    imageSize    = [240, 80, 64];
+    imageSize    = [64, 240, 80];
     numClasses   = 2;
     encoderDepth = 3;
     lgraph       = unetLayers(imageSize,numClasses,'EncoderDepth',encoderDepth);
@@ -11,7 +27,7 @@ function lgraph=get_unet()
     lgraph       = removeLayers(lgraph, 'Softmax-Layer');
     lgraph       = removeLayers(lgraph, 'Final-ConvolutionLayer');
 
-    pl      = convolution2dLayer(1, 1, 'Padding', 'same','Name','output');
+    pl      = convolution2dLayer(1, 80, 'Padding', 'same','Name','output');
     layer   = regressionLayer('Name','routput');
 
     lgraph  = addLayers(lgraph, pl);
@@ -24,24 +40,4 @@ function lgraph=get_unet()
 end
 
 
-function [xtrain, ytrain]=read_train(samples)
 
-    startnum = 42;
-    xpath    = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/25_projvolume/';
-    ypath    = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/35_projvolume/';
-    
-    xtrain = zeros(240, 80, 64, samples, 'single');
-    ytrain = zeros(240, 80, 64, samples, 'single');
-    
-    for t=1:samples
-        tx = load(strcat([xpath, int2str(startnum+t)]));
-        tx = imresize3(tx.recFDK, [240, 80, 64]);
-        
-        ty = load(strcat([ypath, int2str(startnum+t)]));
-        ty = imresize3(ty.recFDK, [240, 80, 64]);
-        
-        xtrain(:, :, :, t) = tx;
-        ytrain(:, :, :, t) = ty;
-    end
-    
-end
