@@ -33,8 +33,8 @@ spectrum_65_r = real(spectrum_65);
 spectrum_65_i = imag(spectrum_65);
 
 
-sa = 42;
-ea = 78;
+sa = 30;
+ea = 90;
 spectrum_25_r(sa:ea, sa:ea, sa:ea) = spectrum_65_r(sa:ea, sa:ea, sa:ea);
 spectrum_25_i(sa:ea, sa:ea, sa:ea) = spectrum_65_i(sa:ea, sa:ea, sa:ea);
 
