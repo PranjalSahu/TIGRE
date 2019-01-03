@@ -5,14 +5,14 @@ ypath    = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/f
 ty = load(strcat([ypath, int2str(startnum+t)]));
 ty = ty.recFDK*100;
 ty = permute(ty, [2 3 1]);
-ty = imresize3(ty, [240, 80, 64]);
+%ty = imresize3(ty, [240, 80, 64]);
 [volume_65, N] = UnifyVolume(ty, 240, 80, 64);
 
 ypath    = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/full-res-projvolume/25_projvolume/';
 ty = load(strcat([ypath, int2str(startnum+t)]));
 ty = ty.recFDK*100;
 ty = permute(ty, [2 3 1]);
-ty = imresize3(ty, [240, 80, 64]);
+%ty = imresize3(ty, [240, 80, 64]);
 [volume_25, N] = UnifyVolume(ty, 240, 80, 64);
 
 %disp(size(volume_25));
