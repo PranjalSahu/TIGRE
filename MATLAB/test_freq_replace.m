@@ -52,3 +52,9 @@ va_i = zeros(120, 120, 120);
 
 slice = 65;
 imshow([real(va(:, :, slice)), real(volume_25(:, :, slice)), real(volume_65(:, :, slice))]);
+
+
+a = reshape(real(va(:, slice, :)), [120, 120]);
+b = reshape(real(volume_25(:, slice, :)), [120, 120]);
+c = reshape(real(volume_65(:, slice, :)), [120, 120]);
+imshow([a, b, c]);
