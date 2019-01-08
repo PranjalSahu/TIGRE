@@ -4,7 +4,7 @@ folderpathfirst  = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_reco
 folderpathsecond = '_888076.0.575565525455.20180521024130774/Phantom.dat';
 reconpathfirst   = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/low-res-projvolume/SART/65_projvolume_wave/';
 
-TotalAngles      = 65;
+TotalAngles      = 25;
 
 for phantomindex=43:99
     
@@ -17,10 +17,10 @@ for phantomindex=43:99
     % 120, 48, 32
     sx_a   = 1000;
     sy_a   = 6000;
-    slices = 249;
-    sx_b   = 939;
-    sy_b   = 329;
-    offdetector_height = 329*0.2/2;
+    slices = 256;
+    sx_b   = 960;
+    sy_b   = 384;
+    offdetector_height = 384*0.2/2;
 
 
     geo.DSD = 655;                             % Distance Source Detector      (mm)
@@ -64,6 +64,8 @@ for phantomindex=43:99
     disp(phantompath);
     
     head        = readphantom(phantompath, [329 249 939]);
+    head        = padarray(head, [3 10 27],'both');
+    head        = padarray(head, [1 1 1],  'post');
     head        = single(head/300);
     projections = Ax(head, geo, angles,'interpolated');
     [recSART_all, recSART,  errL2SART] = SART(projections, geo, angles, 1, 0, 'OrderStrategy', 'ordered');
