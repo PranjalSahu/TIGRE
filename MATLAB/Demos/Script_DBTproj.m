@@ -2,7 +2,7 @@ clc;clear;close all
 
 folderpathfirst  = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/vcts_deformed/';
 folderpathsecond = '_888076.0.575565525455.20180521024130774/Phantom.dat';
-reconpathfirst   = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/low-res-projvolume/SART/65_projvolume_wave/';
+reconpathfirst   = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/low-res-projvolume/SART/25_projvolume_wave/';
 
 TotalAngles      = 25;
 
@@ -68,7 +68,7 @@ for phantomindex=43:99
     head        = padarray(head, [1 1 1],  'post');
     head        = single(head/300);
     projections = Ax(head, geo, angles,'interpolated');
-    [recSART_all, recSART,  errL2SART] = SART(projections, geo, angles, 1, 0, 'OrderStrategy', 'ordered');
+    [recSART_all, recSART,  errL2SART] = SART(projections, geo, angles, 1, 1, 'OrderStrategy', 'ordered');
 
     %recFDK = FDK( projections,geo,angles);
     

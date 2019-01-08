@@ -1,4 +1,4 @@
-function [res,errorL2,qualMeasOut]=SART(proj,geo,angles,niter,varargin)
+function [res_all, res, errorL2, qualMeasOut]=SART(proj,geo,angles,niter, flag_all, varargin)
 %SART solves Cone Beam CT image reconstruction using Oriented Subsets
 %              Simultaneous Algebraic Reconxtruction Techique algorithm
 %
@@ -60,19 +60,20 @@ blocksize=1;
 
 measurequality=~isempty(QualMeasOpts);
 if nargout>1
-    computeL2=true;
+    computeL2 = true;
 else
-    computeL2=false;
+    computeL2 = false;
 end
 errorL2=[];
 
-[~,orig_index]=order_subsets(angles,blocksize,OrderStrategy);
-index_angles=cell2mat(orig_index);
+[~,orig_index] = order_subsets(angles,blocksize,OrderStrategy);
+index_angles   = cell2mat(orig_index);
 
 % does detector rotation exists?
 if ~isfield(geo,'rotDetector')
     geo.rotDetector=[0;0;0];
 end
+
 %% Create weigthing matrices
 
 % Projection weigth, W
@@ -112,6 +113,9 @@ offDetector=geo.offDetector;
 rotDetector=geo.rotDetector;
 DSD=geo.DSD;
 DSO=geo.DSO;
+
+res_all = zeros(size(angles, 2), 32, 120, 48);
+
 % TODO : Add options for Stopping criteria
 for ii=1:niter
     if (ii==1 && verbose==1);tic;end
@@ -163,25 +167,42 @@ for ii=1:niter
         if nonneg
             res(res<0)=0;
         end
+        
+        disp('jj');
+        disp(size(res));
+        
+        
+        if flag_all == 1
+            wd2       = wavedec3(res, 3, 'db1');
+            res_temp  = wd2.dec{1};
+            res_all(jj, :, :, :) = res_temp;
+        else
+            if jj == size(angles, 2)
+                wd2                  = wavedec3(res, 3, 'db1');
+                res_temp             = wd2.dec{1};
+                res_all = res_temp;
+            end
+        end
     end
     
     % If quality is being measured
     if measurequality
         % HERE GOES
-        qualMeasOut(:,ii)=Measure_Quality(res,res_prev,QualMeasOpts);
+        qualMeasOut(:,ii) = Measure_Quality(res,res_prev,QualMeasOpts);
     end
     
     if nesterov
-        gamma=(1-lambda);
-        lambda=(1+sqrt(1+4*lambda^2))/2;
-        gamma=gamma/lambda;
+        gamma  = (1-lambda);
+        lambda = (1+sqrt(1+4*lambda^2))/2;
+        gamma  = gamma/lambda;
     else
         lambda=lambda*lambdared;
     end
     if computeL2 || nesterov
-        geo.offOrigin=offOrigin;
-        geo.offDetector=offDetector;
+        geo.offOrigin   = offOrigin;
+        geo.offDetector = offDetector;
         errornow=im3Dnorm(proj-Ax(res,geo,angles),'L2');                       % Compute error norm2 of b-Ax
+        
         %         If the error is not minimized.
         if  ii~=1 && errornow>errorL2(end)
             if verbose
@@ -189,7 +210,8 @@ for ii=1:niter
             end
             return;
         end
-        errorL2=[errorL2 errornow];
+        
+        errorL2 = [errorL2 errornow];
     end
     
     if (ii==1 && verbose==1);
