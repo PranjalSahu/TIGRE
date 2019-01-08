@@ -2,17 +2,19 @@ clc;clear;close all
 
 folderpathfirst  = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/vcts_deformed/';
 folderpathsecond = '_888076.0.575565525455.20180521024130774/Phantom.dat';
-reconpathfirst   = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/65_projvolume/';
+reconpathfirst   = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/low-res-projvolume/SART/65_projvolume_wave/';
 
 TotalAngles      = 65;
 
-for phantomindex=43:70
+for phantomindex=43:99
     
     disp(phantomindex);
     
     phantompath  = strcat([folderpathfirst, int2str(phantomindex), folderpathsecond]);
     reconpath    = strcat([reconpathfirst, int2str(phantomindex), '.mat']) ;
     
+    % Size for the unet model >> 960, 384, 256
+    % 120, 48, 32
     sx_a   = 1000;
     sy_a   = 6000;
     slices = 249;
@@ -64,8 +66,9 @@ for phantomindex=43:70
     head        = readphantom(phantompath, [329 249 939]);
     head        = single(head/300);
     projections = Ax(head, geo, angles,'interpolated');
+    [recSART_all, recSART,  errL2SART] = SART(projections, geo, angles, 1, 0, 'OrderStrategy', 'ordered');
 
-    recFDK = FDK( projections,geo,angles);
+    %recFDK = FDK( projections,geo,angles);
     
-    save(reconpath, 'recFDK');
+    save(reconpath, 'recSART_all');
 end
