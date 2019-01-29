@@ -1,4 +1,4 @@
-function [res_all, res, errorL2, qualMeasOut]=SART(proj,geo,angles,niter, flag_all, varargin)
+function [res_all, res, errorL2, qualMeasOut]=SART(proj,geo,angles,niter, flag_all, phantomindex, varargin)
 %SART solves Cone Beam CT image reconstruction using Oriented Subsets
 %              Simultaneous Algebraic Reconxtruction Techique algorithm
 %
@@ -54,6 +54,11 @@ function [res_all, res, errorL2, qualMeasOut]=SART(proj,geo,angles,niter, flag_a
 % Coded by:           Ander Biguri
 %--------------------------------------------------------------------------
 
+pause on;
+reconpathfirst   = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/network-infer-volume/';
+
+
+
 %% Deal with input parameters
 blocksize=1;
 [lambda,res,lambdared,verbose,QualMeasOpts,OrderStrategy,nonneg]=parse_inputs(proj,geo,angles,varargin);
@@ -108,11 +113,11 @@ if ischar(lambda)&&strcmp(lambda,'nesterov')
     ynesterov_prev=ynesterov;
 end
 %% Iterate
-offOrigin=geo.offOrigin;
-offDetector=geo.offDetector;
-rotDetector=geo.rotDetector;
-DSD=geo.DSD;
-DSO=geo.DSO;
+offOrigin   = geo.offOrigin;
+offDetector = geo.offDetector;
+rotDetector = geo.rotDetector;
+DSD = geo.DSD;
+DSO = geo.DSO;
 
 res_all = zeros(size(angles, 2), 32, 120, 48);
 
@@ -127,7 +132,10 @@ for ii=1:niter
     
     % reorder angles
     
+    index_counter_angle = 0;
     for jj=index_angles;
+        index_counter_angle = index_counter_angle+1;
+        
         if size(offOrigin,2)==size(angles,2)
             geo.offOrigin=offOrigin(:,jj);
         end
@@ -176,6 +184,35 @@ for ii=1:niter
             wd2       = wavedec3(res, 3, 'db1');
             res_temp  = wd2.dec{1};
             res_all(jj, :, :, :) = res_temp;
+        elseif flag_all == 3
+            wd2       = wavedec3(res, 3, 'db1');
+            res_temp  = wd2.dec{1};
+            reconpath = strcat([reconpathfirst, int2str(phantomindex), '_', int2str(index_counter_angle), '.mat']);
+            save(reconpath, 'res_temp');
+            
+            infered_path = strcat([reconpathfirst, int2str(phantomindex), '_net_', int2str(index_counter_angle), '.mat']);
+            go_flag = true;
+            while go_flag
+                if isfile(infered_path)
+                    try
+                        go_flag = false;
+                        disp('Reading file created from network');
+                        net_file = load(infered_path);
+                        wd2.dec{1} = net_file.img;
+                        res = single(waverec3(wd2));
+                        disp('class of waverec result');
+                        disp(class(res));
+                        % recreate the volume by doing wavelet recon
+                        disp(size(res));
+                    catch
+                        go_flag  = true;
+                        pause(3);
+                    end
+                else
+                    disp('Sleeping for network file');
+                    pause(3);
+                end
+            end
         else
             if jj == size(angles, 2)
                 wd2                  = wavedec3(res, 3, 'db1');
@@ -198,12 +235,13 @@ for ii=1:niter
     else
         lambda=lambda*lambdared;
     end
+    
     if computeL2 || nesterov
         geo.offOrigin   = offOrigin;
         geo.offDetector = offDetector;
         errornow=im3Dnorm(proj-Ax(res,geo,angles),'L2');                       % Compute error norm2 of b-Ax
         
-        %         If the error is not minimized.
+        % If the error is not minimized.
         if  ii~=1 && errornow>errorL2(end)
             if verbose
                 disp(['Convergence criteria met, exiting on iteration number:', num2str(ii)]);
