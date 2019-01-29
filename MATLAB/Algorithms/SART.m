@@ -55,8 +55,8 @@ function [res_all, res, errorL2, qualMeasOut]=SART(proj,geo,angles,niter, flag_a
 %--------------------------------------------------------------------------
 
 pause on;
-reconpathfirst   = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/network-infer-volume/';
-
+%reconpathfirst   = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/network-infer-volume-partial-5/';
+reconpathfirst = '/media/pranjal/2d33dff3-95f7-4dc0-9842-a9b18bcf1bf9/pranjal/DBT_data/network-infer-volume-partial-5/';
 
 
 %% Deal with input parameters
@@ -119,7 +119,7 @@ rotDetector = geo.rotDetector;
 DSD = geo.DSD;
 DSO = geo.DSO;
 
-res_all = zeros(size(angles, 2), 32, 120, 48);
+res_all = zeros(size(angles, 2), 40, 128, 48);
 
 % TODO : Add options for Stopping criteria
 for ii=1:niter
@@ -133,7 +133,7 @@ for ii=1:niter
     % reorder angles
     
     index_counter_angle = 0;
-    for jj=index_angles;
+    for jj=index_angles
         index_counter_angle = index_counter_angle+1;
         
         if size(offOrigin,2)==size(angles,2)
@@ -181,41 +181,50 @@ for ii=1:niter
         
         
         if flag_all == 1
-            wd2       = wavedec3(res, 3, 'db1');
-            res_temp  = wd2.dec{1};
-            res_all(jj, :, :, :) = res_temp;
+            if mod(jj, 2) == 0
+                % Uncomment this code for wavelet to work
+                wd2       = wavedec3(res, 3, 'db3');
+                res_temp  = wd2.dec{1};
+                res_all(jj/2, :, :, :) = res_temp;
+            end
         elseif flag_all == 3
-            wd2       = wavedec3(res, 3, 'db1');
-            res_temp  = wd2.dec{1};
-            reconpath = strcat([reconpathfirst, int2str(phantomindex), '_', int2str(index_counter_angle), '.mat']);
-            save(reconpath, 'res_temp');
-            
-            infered_path = strcat([reconpathfirst, int2str(phantomindex), '_net_', int2str(index_counter_angle), '.mat']);
-            go_flag = true;
-            while go_flag
-                if isfile(infered_path)
-                    try
-                        go_flag = false;
-                        disp('Reading file created from network');
-                        net_file = load(infered_path);
-                        wd2.dec{1} = net_file.img;
-                        res = single(waverec3(wd2));
-                        disp('class of waverec result');
-                        disp(class(res));
-                        % recreate the volume by doing wavelet recon
-                        disp(size(res));
-                    catch
-                        go_flag  = true;
+            if mod(index_counter_angle, 5) == 0
+                wd2       = wavedec3(res, 3, 'db1');
+                res_temp  = wd2.dec{1};
+                reconpath = strcat([reconpathfirst, int2str(phantomindex), '_', int2str(index_counter_angle), '.mat']);
+                save(reconpath, 'res_temp');
+                
+                reconpath = strcat([reconpathfirst, int2str(phantomindex), '_full_', int2str(index_counter_angle), '.mat']);
+                save(reconpath, 'res');
+                
+                infered_path = strcat([reconpathfirst, int2str(phantomindex), '_net_', int2str(index_counter_angle), '.mat']);
+                
+                go_flag = true;
+                while go_flag
+                    if isfile(infered_path)
+                        try
+                            go_flag = false;
+                            disp('Reading file created from network');
+                            net_file = load(infered_path);
+                            wd2.dec{1} = net_file.img;
+                            res = single(waverec3(wd2));
+                            disp('class of waverec result');
+                            disp(class(res));
+                            % recreate the volume by doing wavelet recon
+                            disp(size(res));
+                        catch
+                            go_flag  = true;
+                            pause(3);
+                        end
+                    else
+                        disp('Sleeping for network file');
                         pause(3);
                     end
-                else
-                    disp('Sleeping for network file');
-                    pause(3);
                 end
             end
         else
             if jj == size(angles, 2)
-                wd2                  = wavedec3(res, 3, 'db1');
+                wd2                  = wavedec3(res, 3, 'db3');
                 res_temp             = wd2.dec{1};
                 res_all = res_temp;
             end
@@ -324,14 +333,18 @@ for ii=1:length(opts)
     default=defaults(ii);
     % if one option isnot default, then extranc value from input
     if default==0
-        ind=double.empty(0,1);jj=1;
+        ind = double.empty(0,1);
+        jj  = 1;
+        
         while isempty(ind)
             ind=find(isequal(opt,lower(argin{jj})));
             jj=jj+1;
         end
+        
         if isempty(ind)
             error('TIGRE:SART:InvalidInput',['Optional parameter "' argin{jj} '" does not exist' ]);
         end
+        
         val=argin{jj};
     end
     
@@ -393,8 +406,8 @@ for ii=1:length(opts)
             if default
                 continue;
             end
-            if exist('initwithimage','var');
-                if isequal(size(val),geo.nVoxel');
+            if exist('initwithimage','var')
+                if isequal(size(val), geo.nVoxel');
                     res=single(val);
                 else
                     error('TIGRE:SART:InvalidInput','Invalid image for initialization');
