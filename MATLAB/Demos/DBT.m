@@ -75,14 +75,14 @@ close all;
 % offdetector_height = 55;
 %
 % % Synthetic Data
-filepath = 'C:\\Users\\psahu\\TESTBED\\projections\\44_250\\';
-sx_a   = 1000;
-sy_a   = 3600;
-slices = 50; %50;
-sx_b   = 2400;
-sy_b   = 840;
-volume_name   = 'CE_2400x840_249_10.raw';
-offdetector_height = 75;
+% filepath = 'C:\\Users\\psahu\\TESTBED\\projections\\44_250\\';
+% sx_a   = 1000;
+% sy_a   = 3600;
+% slices = 50; %50;
+% sx_b   = 2400;
+% sy_b   = 840;
+% volume_name   = 'CE_2400x840_249_10.raw';
+% offdetector_height = 75;
 
 %
 % Synthetic Data downsampled (Does not work)
@@ -98,14 +98,14 @@ offdetector_height = 75;
 %
 % % Settings for CE-26
 %filepath = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE26/RE_diff/';
-% filepath  = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE26/T_PR_RAW_R-CC_DIAGNOSIS_0003/' ;
-% sx_a   = 860;
-% sy_a   = 3584;
-% slices = 58;
-% sx_b   = 2810;
-% sy_b   = 860;
-% volume_name   = 'CE_2810x860_58_1.raw';
-% offdetector_height = 35;
+filepath  = '/media/pranjal/de24af8d-2361-4ea2-a07a-1801b54488d9/DBT_recon_data/CE26/T_PR_RAW_R-CC_DIAGNOSIS_0003/' ;
+sx_a   = 860;
+sy_a   = 3584;
+slices = 464;
+sx_b   = 2810;
+sy_b   = 860;
+volume_name   = 'CE_2810x860x464_5.raw';
+offdetector_height = 35;
 
 
 
@@ -132,7 +132,7 @@ geo.sDetector = geo.nDetector.*geo.dDetector;       % total size of the detector
 
 % Image parameters
 geo.nVoxel = [slices; sx_b; sy_b];             % number of voxels              (vx)
-geo.dVoxel = [1 ; 0.085; 0.085];               % size of each voxel            (mm)
+geo.dVoxel = [0.125; 0.085; 0.085];               % size of each voxel            (mm)
 geo.sVoxel = geo.nVoxel.*geo.dVoxel;           % total size of the image       (mm)
 
 
